@@ -106,17 +106,18 @@ function addNewDirectoryToSelectedDirectory() {
 function getNewDirectoryData(inputElement) {
     var parent_dir = getDirectoryData(inputElement.closest('ul').closest('li'));
     return {
-        parent : parent_dir,
         name : inputElement.val()
     }
 }
 
 function saveDirectory(inputElement, value) {
     if (!value) value = inputElement.val();
-    inputElement.closest('div').attr('id', util.slugify(value));
+    var directoryBox = inputElement.closest('div')
+    directoryBox.attr('id', util.slugify(value));
     inputElement.replaceWith('<span class="editable">' + value+ '</span>');
     directory.name = value;
     directoriesData[util.slugify(value)] = directory;
+    return directoryBox.closest('li');
 }
 
 function removeDirectory(element) {

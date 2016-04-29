@@ -154,6 +154,10 @@ function attachDiskElementEvents() {
 
 function attachDirectoryEvents(dirElement) {
 
+	if (dirElement.is('ul')) {
+		dirElement = dirElement.find('> li');
+    }
+
 	eventHandler.attachKeysEventOnDirectories(dirElement);
 	eventHandler.attachClickEventOnDirectories(dirElement);
 

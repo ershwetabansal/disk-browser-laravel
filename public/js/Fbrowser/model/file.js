@@ -39,7 +39,7 @@ function file() {
                 var gridElements = '<li id="'+file.id+'" tabindex="1"><div>';
                 file.type = file.type || util.getFileType(file.name);
 
-                var path = reqHandler.getAbsolutePath(file, file.path || rootPath);
+                var path = file.path || reqHandler.getAbsolutePath(file, rootPath);
 
                 gridElements += (util.isImage(file.type)) ? '<img src="' + path + '" alt="' + file.name + '"/>'
                                 :

@@ -140,7 +140,7 @@ function attachDiskElementEvent(callback) {
 *****************************************************/
 function attachClickEventOnDirectories(dirElement) {
 
-	dirElement.find('li').each(function() {
+	dirElement.each(function() {
 		var liElement = $(this);
 		liElement.find('> div').click(function() {
             reqHandler.getFileHandler().cleanUpView();
@@ -157,8 +157,7 @@ function attachClickEventOnDirectories(dirElement) {
 }
 
 function attachKeysEventOnDirectories(dirElement) {
-    if (dirElement.is('ul'))
-	dirElement.find('> li').keydown(function(event){
+	dirElement.keydown(function(event){
 		if ($(event.target).parent().is(dirElement)) {
 			var keys = new KeyHandler(event); 
 			if (keys[event.which]) keys[event.which]();			
@@ -233,7 +232,8 @@ function attachCreateDirectoryEvent(url) {
 
 		function success(response) {
             if (response.success == true) {
-                reqHandler.getDirHandler().saveDirectory(inputElement);
+                var dirElement = reqHandler.getDirHandler().saveDirectory(inputElement);
+                reqHandler.attachDirectoryEvents(dirElement);
             } else {
                 alert('Directory already exists');
                 reqHandler.getDirHandler().removeDirectory(inputElement);
@@ -250,7 +250,7 @@ function attachCreateDirectoryEvent(url) {
 }
 
 function attachRenameDirectoryEvent(dirElement, url) {
-	dirElement.find('li').each(function() {
+	dirElement.each(function() {
 		$(this).find('> div').dblclick(function() {
 			var inputElement = reqHandler.getDirHandler().renameDirectory($(this));
       
