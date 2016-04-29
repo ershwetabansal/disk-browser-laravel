@@ -23,10 +23,8 @@ class UploadFileRequest extends Request
      */
     public function rules()
     {
-        $availableDisks = collect(config('disks'));
-
         return [
-            'disk'  => 'required|in:' . array_keys($availableDisks),
+            'disk'  => 'required|in:' . implode(',',array_keys(config('filesystems.disks'))),
             'path'  => 'required',
             'file'  => 'required|mimes:pdf,xls,xlsx,doc,docx,gif,png,jpg,bmp',
         ];

@@ -52,13 +52,14 @@ return [
             'driver' => 'local',
             'root'   => env('BASE_PATH') . 'public/images',
             'type'   => 'png,jpg,jpeg',
+            'path'   => '/images/',
         ],
 
         'ea_publications' => [
             'driver' => 'local',
             'root'   => env('BASE_PATH') . 'public/publications',
             'type'   => 'doc,docx,pdf,xls,xlsx',
-            'relativePath' => '/publications',
+            'path'   => '/publications/',
         ],
 
         'ftp' => [

@@ -31,13 +31,12 @@ class LocalBrowser implements DiskBrowserContract
     {
         $fileNames = File::filesIn($this->disk, $directory);
         $files = [];
-
         foreach( $fileNames as $file) {
 
             $fileData = [];
             $fileData['name'] = self::getNameFromPath($file);
             if (substr($fileData['name'],0,1) != '.') {
-                $fileData['path'] = $file;
+                $fileData['path'] = config('filesystems.disks.ea_images.path') . $file;
                 $fileData['size'] = File::getSizeOf($file, $this->disk);
                 $fileData['last_modified_date'] = File::getLastModifiedOf($file, $this->disk);
 
@@ -80,7 +79,7 @@ class LocalBrowser implements DiskBrowserContract
     {
         $isDirectoryAdded = false;
 
-        if (Directory::doesDirectoryExistsIn($directory, $directory, $name) == false) {
+        if (Directory::doesDirectoryExistsIn($this->disk, $directory, $name) == false) {
             $isDirectoryAdded = Directory::createDirectoryIn($this->disk, $directory, $name);
         }
 
@@ -95,7 +94,9 @@ class LocalBrowser implements DiskBrowserContract
      */
     public function createFileIn($directory, UploadedFile $file)
     {
-        $newFileName = uniqid() . str_slug($file->getClientOriginalName(), '_') . '.' . $file->getClientOriginalExtension();
+        $newFileName = uniqid() . '_' . 
+                       str_slug($file->getClientOriginalName(), '_') . '.' . 
+                       $file->getClientOriginalExtension();
 
         $isFileUploaded = File::uploadFile($file, $newFileName, $this->disk, $directory);
 
