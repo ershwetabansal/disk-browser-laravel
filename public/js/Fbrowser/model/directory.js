@@ -41,13 +41,13 @@ function loadDirectories(data) {
     element.selectFirst(element.getDirectories());
 }
 
-function showSubDirectories(liElement) {
-    if (liElement.find('ul').length == 0) {
+function showSubDirectories(liElement, directories) {
+    if (liElement.find('ul').length == 0 && !isRootDirectory()) {
         var directory = getDirectoryData(liElement);
 
-        if (directory && directory.directories && directory.directories.length > 0) {
+        if (directories && directories.length > 0) {
             liElement.append($('<ul></ul>'));
-            addDirectoriesElements(liElement.find('ul'), directory.directories, false);
+            addDirectoriesElements(liElement.find('ul'), directories, false);
             reqHandler.attachDirectoryEvents(liElement.find('ul'));
         }
     }
@@ -115,6 +115,7 @@ function saveDirectory(inputElement, value) {
     var directoryBox = inputElement.closest('div')
     directoryBox.attr('id', util.slugify(value));
     inputElement.replaceWith('<span class="editable">' + value+ '</span>');
+    var directory = {};
     directory.name = value;
     directoriesData[util.slugify(value)] = directory;
     return directoryBox.closest('li');

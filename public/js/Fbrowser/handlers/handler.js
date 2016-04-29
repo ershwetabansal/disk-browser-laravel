@@ -158,8 +158,8 @@ function attachDirectoryEvents(dirElement) {
 		dirElement = dirElement.find('> li');
     }
 
-	eventHandler.attachKeysEventOnDirectories(dirElement);
-	eventHandler.attachClickEventOnDirectories(dirElement);
+	eventHandler.attachKeysEventOnDirectories(dirElement, directoriesParam.list);
+	eventHandler.attachClickEventOnDirectories(dirElement, directoriesParam.list);
 
 	renameDirectorySetup();	
 	deleteDirectorySetup();
@@ -264,11 +264,11 @@ function getDiskParameter() {
  ************************************************/
 
 function getAbsolutePath(file, path) {
-    if (typeof(path) != 'undefined') {
-        return path + "/" + file.name;
-    } else {
-        return file.path;
-    }
+	if (file.path) {
+		return file.path;
+	} else if (typeof(path) != 'undefined') {
+		return path + '/' +file.name;
+	}
 }
 
 function getRootPathForCurrentDir() {

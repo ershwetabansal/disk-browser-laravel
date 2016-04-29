@@ -22,7 +22,7 @@ describe("File browser should be able to manage directories and ", function() {
     it("should be able to show directories when any directory is clicked.", function() {
     
     	var directory = element.getDirectories().find('li').eq(1);
-    	setup.getDirHandler().showSubDirectories(directory);
+    	setup.getDirHandler().showSubDirectories(directory, stub.getDirectoryData());
     	
     	expect(directory.find('ul').length).toBe(1);
     
@@ -31,7 +31,7 @@ describe("File browser should be able to manage directories and ", function() {
     it("should be able to hide directories when already sub directories are shown.", function() {
     	
     	var directory = element.getDirectories().find('li').eq(1);
-    	setup.getDirHandler().showSubDirectories(directory);
+    	setup.getDirHandler().showSubDirectories(directory, stub.getDirectoryData());
     	setup.getDirHandler().hideSubDirectories(directory);
 
     	expect(directory.find('ul').length).toBe(0);
@@ -93,7 +93,7 @@ describe("File browser should be able to manage directories and ", function() {
 		
 		var directory = element.getDirectories().find('li').eq(1);
 
-		setup.getDirHandler().showSubDirectories(directory);
+		setup.getDirHandler().showSubDirectories(directory, stub.getDirectoryData());
 		expect(setup.getDirHandler().childDirOpen(directory)).toBe(true);
 
 		setup.getDirHandler().hideSubDirectories(directory);

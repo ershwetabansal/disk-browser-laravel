@@ -129,6 +129,8 @@ function clearSearch() {
 function attachDiskElementEvent(callback) {
 	element.getDiskNavbar().find('li').each(function() {
 		$(this).click(function() {
+			element.select(element.getDiskNavbar(), $(this));
+			//TODO Show loading bar
             reqHandler.loadDirectories();
             reqHandler.getFileHandler().cleanUpView();
 		});
@@ -138,7 +140,7 @@ function attachDiskElementEvent(callback) {
 /****************************************************
 ** Directory Events
 *****************************************************/
-function attachClickEventOnDirectories(dirElement) {
+function attachClickEventOnDirectories(dirElement, url) {
 
 	dirElement.each(function() {
 		var liElement = $(this);
@@ -149,14 +151,26 @@ function attachClickEventOnDirectories(dirElement) {
 			if (reqHandler.getDirHandler().childDirOpen(liElement)) {
 				reqHandler.getDirHandler().hideSubDirectories(liElement);
 			} else {
-				reqHandler.getDirHandler().showSubDirectories(liElement);
+				fetchSubdirectories(url, function(response) {
+					reqHandler.getDirHandler().showSubDirectories(liElement, response);
+				});
 			}
 			reqHandler.loadFiles();		
 		});
 	});
 }
 
-function attachKeysEventOnDirectories(dirElement) {
+function fetchSubdirectories(url, callback) {
+
+	var params =  {};
+	reqHandler.makeAjaxRequest(url, callback, fail, false, params)
+	
+	function fail() {
+		alert('failed to get sub directories');
+	}
+
+}
+function attachKeysEventOnDirectories(dirElement, url) {
 	dirElement.keydown(function(event){
 		if ($(event.target).parent().is(dirElement)) {
 			var keys = new KeyHandler(event); 
@@ -172,7 +186,9 @@ function attachKeysEventOnDirectories(dirElement) {
 			},
 			//right
 			39 : function() {
-				reqHandler.getDirHandler().showSubDirectories($(event.target));
+				fetchSubdirectories(url, function(response) {
+					reqHandler.getDirHandler().showSubDirectories($(event.target), response);
+				});
 			},
 			//up
 			38 : function() {
