@@ -405,7 +405,6 @@ function attachUploadFileEvent(uploadObj) {
 		element.hide(element.getFileBrowserUploadForm());
 		
 		var formData = new FormData(element.getFileBrowserUploadForm()[0]);
-		console.log(formData);
         reqHandler.makeAjaxRequest(uploadObj.url, success, fail, false, formData, true);
 
 		function success(response) {

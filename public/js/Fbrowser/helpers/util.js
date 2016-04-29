@@ -1,8 +1,25 @@
-var allowedImageTypes = ['jpg', 'png', 'gif', 'jpeg'];
-var allowedDocTypes = ['doc', 'docx'];
-var allowedPdfTypes = ['pdf'];
-var allowedTextTypes = ['txt'];
-var allowedExcelType = ['xls', 'xlsx'];
+var fileExtensions = {
+    Image : ['jpg', 'png', 'gif', 'jpeg', 'tiff', 'bmp'],
+    Excel : ['xls', 'xlsx'],
+    Text : ['txt'],
+    PDF : ['pdf'],
+    Word : ['doc', 'docx'],
+    Javascript : ['js'],
+    Css : ['css'],
+    JSON : ['json'],
+    xml : ['xml']
+};
+var fontClassesForFileType = {
+    Image : 'fa-file-image-o',
+    Excel : 'fa-file-excel-o',
+    Text : 'fa-file-text-o',
+    PDF : 'fa-file-pdf-o',
+    Word : 'fa-file-word-o',
+    Javascript : 'fa-file-code-o',
+    Css : 'fa-file-code-o',
+    JSON : 'fa-file-code-o',
+    xml : 'fa-file-code-o'
+};
 
 function slugify(name) {
     return name.toLowerCase().replace(new RegExp(' ', 'g'), '_')
@@ -16,25 +33,13 @@ function unSlugify(name) {
 }
 
 function isImage(type) {
-    return (allowedImageTypes.indexOf(type) > -1);
+    return (type == 'Image');
 }
 
 function getFontAwesomeClass(type) {
-    var faClasses = {};
-
-    function updateClasses(array, css) {
-        array.forEach(function(item) {
-            faClasses[item] = css;
-        });  
-    }
-    
-    updateClasses(allowedImageTypes, 'fa-file-image-o');
-    updateClasses(allowedExcelType, 'fa-file-excel-o');
-    updateClasses(allowedTextTypes, 'fa-file-text-o');
-    updateClasses(allowedPdfTypes, 'fa-file-pdf-o');
-    updateClasses(allowedDocTypes, 'fa-file-word-o');
-
-    return faClasses[type];
+    var css = fontClassesForFileType[type];
+    css = css || 'fa-file-o';
+    return css;
 }
 
 function compareAsc(a, b, prop) {
@@ -99,11 +104,23 @@ function getCookie(cookieName) {
     }
 }
 
+function getFileType(filename) {
+
+    var extension = filename.split('.').pop();
+
+    for (var type in fileExtensions) {
+        if (fileExtensions[type].indexOf(extension) > - 1) {
+            return type;
+        }
+    }
+}
+
 module.exports = {
     slugify: slugify,
     unSlugify: unSlugify,
     isImage: isImage,
     getFontAwesomeClass: getFontAwesomeClass,
     sortByType: sortByType,
-    getCookie: getCookie
+    getCookie: getCookie,
+    getFileType: getFileType
 };

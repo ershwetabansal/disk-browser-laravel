@@ -39,7 +39,7 @@ function manager(setupObject)
 
         var httpParamValidation = validate.httpParam(setupObject);
         if (httpParamValidation == true) {
-            httpParam = setupObject.files;
+            httpParam = setupObject.http;
         } else {
             error = true;
             console.error(httpParamValidation);
@@ -47,7 +47,7 @@ function manager(setupObject)
 
         var authParamValidation = validate.authParam(setupObject);
         if (authParamValidation == true) {
-            authParam = setupObject.files;
+            authParam = setupObject.auth;
         } else {
             error = true;
             console.error(authParamValidation);

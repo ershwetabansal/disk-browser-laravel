@@ -2,13 +2,13 @@ module.exports = function(config) {
     config.set({
         frameworks: ['browserify','jasmine'],
         reporters: ['dots'],
-        browsers: ['PhantomJS'],
+        browsers: ['Chrome'],
         files: [
             'node_modules/jquery/dist/jquery.min.js',
-            'tests/unit/**/*Spec.js'
+            'tests/client/file_browser/**/*Spec.js'
         ],
         preprocessors: {
-            'tests/unit/**/*.js': [ 'browserify' ]
+            'tests/client/file_browser/**/*Spec.js': [ 'browserify' ]
         },
         browserify: {
             debug: true,
@@ -18,7 +18,7 @@ module.exports = function(config) {
         plugins: [
           'karma-jasmine',
           'karma-browserify',
-          'karma-phantomjs-launcher'
+          'karma-chrome-launcher'
         ]
     });
 };

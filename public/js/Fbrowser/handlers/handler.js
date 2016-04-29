@@ -287,18 +287,13 @@ function makeAjaxRequest(url, successCallback, failureCallback, cache, data, isU
         cache = true;
     }
 
-    var params = (isUpload != true) ? JSON.stringify(addCommonParameters(data)) : addCommonParametersToFormData(data);
+    var params = (isUpload != true) ? addCommonParameters(data) : addCommonParametersToFormData(data);
 
     $.ajax({
         url : url,
         method : method,
-        headers: {
-            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-        },
         data : params,
         cache: cache,
-        contentType: false,
-        processData: false,
         beforeSend: function (request)
         {
             if (httpParams && httpParams.headers) {
@@ -314,20 +309,6 @@ function makeAjaxRequest(url, successCallback, failureCallback, cache, data, isU
     });
 }
 
-var getXsrfToken = function() {
-    var cookies = document.cookie.split(';');
-    var token = '';
-
-    for (var i = 0; i < cookies.length; i++) {
-        var cookie = cookies[i].split('=');
-        if(cookie[0] == 'XSRF-TOKEN') {
-            token = decodeURIComponent(cookie[1]);
-        }
-    }
-
-    return token;
-}
-
 function addCommonParametersToFormData(formData) {
 	var params = addCommonParameters();
 	for (var key in params) {
@@ -340,15 +321,15 @@ function addCommonParametersToFormData(formData) {
 function addCommonParameters(params) {
 
     params = params || {};
-
     var disk = diskHandler.getCurrentDisk();
     if (disk) {
         params.disk = disk.name;
     }
 
     var dirPath = dirHandler.getCurrentDirectoryPath();
+    dirPath =  dirPath || '/';
     if (dirPath) {
-        params.directory = dirPath;
+        params.path = dirPath;
     }
 
     return params;

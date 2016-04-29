@@ -1,6 +1,6 @@
 var stub = require('../helpers/stub.js');
 var setup = require('../helpers/setup.js');
-var element = require('../../../public/js/Fbrowser/helpers/element.js');
+var element = require('../../../../public/js/Fbrowser/helpers/element.js');
 
 var dirHandler, fileHandler, diskHandler;
 describe("File browser should be able to manage disks, directories and files. User", function() {

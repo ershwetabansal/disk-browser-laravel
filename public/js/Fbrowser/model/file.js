@@ -37,7 +37,9 @@ function file() {
                 var file = filesArray[i];
                 file.id = util.slugify(file.name);
                 var gridElements = '<li id="'+file.id+'" tabindex="1"><div>';
-                var path = reqHandler.getAbsolutePath(file, rootPath);
+                file.type = file.type || util.getFileType(file.name);
+
+                var path = reqHandler.getAbsolutePath(file, file.path || rootPath);
 
                 gridElements += (util.isImage(file.type)) ? '<img src="' + path + '" alt="' + file.name + '"/>'
                                 :
@@ -55,6 +57,8 @@ function file() {
             for (var i=0, len = filesArray.length; i < len; i++) {
                 var file = filesArray[i];
                 file.id = util.slugify(file.name);
+                file.type = file.type || util.getFileType(file.name);
+
                 var listElements = '<tr id="'+file.id+'" tabindex="1">';
 
                 for (var key in reqHandler.getFileResponseParams()) {
