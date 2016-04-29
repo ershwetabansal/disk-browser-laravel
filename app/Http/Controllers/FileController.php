@@ -17,13 +17,10 @@ class FileController extends Controller
      */
     public function index(GetFilesRequest $request)
     {
-        $path = null;
+        $path = \App\LocalFileBrowser::getFilePath($request->all()['disk'], $request->all()['path']);
         $files = [];
-        if ($request->all()['disk'] == 'assets') {
-            $path = '/public/assets' . $request->all()['path'];
-        }
 
-        if ($path != null) {
+        if ($path) {
             $files = \App\LocalFileBrowser::files($path);
         }
 
@@ -41,14 +38,34 @@ class FileController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return array
+     * @throws \Exception
      */
     public function store(Request $request)
     {
-        //
+        $upload = $request->file('file');
+
+        if (! $upload->isValid()) {
+            throw new \Exception('Invalid file uploaded.');
+        }
+
+        $content = file_get_contents($upload->getRealPath());
+
+        $newFileName = time() . '_' . uniqid() . '.' . $upload->getClientOriginalExtension();
+
+        $path = \App\LocalFileBrowser::getFilePath($request->all()['disk'], $request->all()['path']);
+
+        \App\LocalFileBrowser::uploadFile($path, $newFileName, $content);
+
+        return [
+            'path' => $path . $newFileName,
+            'name' => $newFileName,
+            'size' => \App\LocalFileBrowser::size($path . "/" . $newFileName),
+            'last_modified_date' => \App\LocalFileBrowser::lastModified($path . "/" . $newFileName),
+        ];
+
     }
 
     /**

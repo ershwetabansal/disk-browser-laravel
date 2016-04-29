@@ -54,6 +54,10 @@ class LocalFileBrowser extends Model
         return $files;
     }
 
+    public static function uploadFile($directory, $fileName, $fileContent)
+    {
+        Storage::disk('local')->put($directory . "/" . $fileName, $fileContent);
+    }
     /**
      * Returns the sub directories in a particular directory
      * @param $directory
@@ -103,5 +107,21 @@ class LocalFileBrowser extends Model
     {
         $result = array_reverse(explode('/', $path));
         return $result[0];
+    }
+
+    /**
+     * Get File path
+     * @param $disk
+     * @param $location
+     * @return string
+     */
+    public static function getFilePath($disk, $location)
+    {
+        $path = '';
+        if ($disk == 'assets') {
+            $path = '/public/assets' . $location;
+        }
+
+        return $path;
     }
 }

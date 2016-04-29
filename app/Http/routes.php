@@ -17,6 +17,7 @@ Route::group(['prefix' => '/api/v1/'], function () {
 
         Route::post('directories', 'DirectoryController@index');
         Route::post('files', 'FileController@index');
+        Route::post('file/store', 'FileController@store');
 
     });
 });

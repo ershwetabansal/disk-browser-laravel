@@ -66,4 +66,10 @@ class FileBrowserIntegrationTest extends TestCase
 
         }
     }
+
+    /** @test */
+    public function it_should_upload_file()
+    {
+        //on sending the file path, file name and file content the file should 
+    }
 }
