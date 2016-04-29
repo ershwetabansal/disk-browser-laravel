@@ -286,28 +286,39 @@ function makeAjaxRequest(url, successCallback, failureCallback, cache, data, isU
     if (typeof(cache) == 'undefined') {
         cache = true;
     }
-
     var params = (isUpload != true) ? addCommonParameters(data) : addCommonParametersToFormData(data);
 
-    $.ajax({
-        url : url,
-        method : method,
-        data : params,
-        cache: cache,
-        beforeSend: function (request)
-        {
-            if (httpParams && httpParams.headers) {
-                for (var key in httpParams.headers) {
-                    request.setRequestHeader(key, httpParams.headers[key]);
-                }
-            }
-        }
-    }).success(function (data) {
+    $.ajax(getAjaxParameters()).success(function (data) {
         if (successCallback) successCallback(data);
     }).fail(function () {
         if (failureCallback) failureCallback();
     });
+
+    function getAjaxParameters() {
+        var parameters = {
+            url : url,
+            method : method,
+            data : params,
+            cache: cache,
+            beforeSend: function (request)
+            {
+                if (httpParams && httpParams.headers) {
+                    for (var key in httpParams.headers) {
+                        request.setRequestHeader(key, httpParams.headers[key]);
+                    }
+                }
+            }
+        };
+
+        if (isUpload == true) {
+            parameters.processData = false;
+            parameters.contentType = false;
+        }
+        return parameters;
+    }
+
 }
+
 
 function addCommonParametersToFormData(formData) {
 	var params = addCommonParameters();
