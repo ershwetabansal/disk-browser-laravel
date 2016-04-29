@@ -10,28 +10,98 @@ class LocalFileBrowser extends Model
 {
 
 
-    public static function directoriesStructure($directory = null)
+    /**
+     * Returns the directory structure in a local disk folder
+     * @param $directory
+     * @return array
+     */
+    public static function directoriesStructure($directory)
     {
-        if (is_null($directory)) {
-            $directory = '/public';
-        }
-
         $directories = self::subDirectories($directory);
         $directoryHierarchy = [];
 
         foreach( $directories as $dir) {
+
             $dirData = [];
-            $dirData['name'] = $dir;
+            $dirData['path'] = $dir;
+            $dirData['name'] = self::getNameFromPath($dir);
             $dirData['directories'] = self::directoriesStructure($dir);
+
             $directoryHierarchy[] = $dirData;
         }
 
         return $directoryHierarchy;
     }
 
+    public static function files($directory)
+    {
+        $fileNames = self::filesInDirectory($directory);
+        $files = [];
+
+        foreach( $fileNames as $file) {
+
+            $fileData = [];
+            $fileData['name'] = self::getNameFromPath($file);
+            if (substr($fileData['name'],0,1) != '.') {
+                $fileData['path'] = $file;
+                $fileData['size'] = self::size($file);
+                $fileData['last_modified_date'] = self::lastModified($file);
+
+                $files[] = $fileData;
+            }
+        }
+
+        return $files;
+    }
+
+    /**
+     * Returns the sub directories in a particular directory
+     * @param $directory
+     * @return mixed
+     */
     public static function subDirectories($directory)
     {
         return collect(Storage::disk('local')->directories($directory));
     }
 
+    /**
+     * Returns files in a given directory
+     * @param $directory
+     * @return mixed
+     */
+    public static function filesInDirectory($directory)
+    {
+        return collect(Storage::disk('local')->files($directory));
+    }
+
+    /**
+     * Returns size of a file
+     * @param $file
+     * @return mixed
+     */
+    public static function size($file)
+    {
+        return Storage::size($file) / 1000;
+    }
+
+    /**
+     * Returns last modified date of a file
+     * @param $file
+     * @return mixed
+     */
+    public static function lastModified($file)
+    {
+        return date('d M Y H:i:s', Storage::lastModified($file));
+    }
+
+    /**
+     * Returns name from a given path string
+     * @param $path
+     * @return mixed
+     */
+    public static function getNameFromPath($path)
+    {
+        $result = array_reverse(explode('/', $path));
+        return $result[0];
+    }
 }

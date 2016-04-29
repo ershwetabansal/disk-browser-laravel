@@ -4,31 +4,30 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\GetDirectoriesRequest;
+use App\Http\Requests\GetFilesRequest;
 
-class DirectoryController extends Controller
+class FileController extends Controller
 {
     /**
-     * Return the list of directories
+     * Return the list of files
      * @param $request
      * @return array
      */
-    public function index(GetDirectoriesRequest $request)
+    public function index(GetFilesRequest $request)
     {
-        $directory = null;
-        $directories = [];
+        $path = null;
+        $files = [];
         if ($request->all()['disk'] == 'assets') {
-            $directory = '/public/assets';
+            $path = '/public/assets' . $request->all()['path'];
         }
 
-        if ($directory != null) {
-            $directories = \App\LocalFileBrowser::directoriesStructure($directory);
+        if ($path != null) {
+            $files = \App\LocalFileBrowser::files($path);
         }
 
-        return $directories;
+        return $files;
     }
 
     /**
