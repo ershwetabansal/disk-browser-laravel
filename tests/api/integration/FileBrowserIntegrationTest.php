@@ -63,13 +63,21 @@ class FileBrowserIntegrationTest extends TestCase
 
         //Each file should have 'name', 'path', 'size' and 'last_modified_date'
         foreach($files as $file) {
-
         }
     }
 
     /** @test */
     public function it_should_upload_file()
     {
-        //on sending the file path, file name and file content the file should 
+        //on sending the file path, file name and file content the file should get added to the given path
+    }
+
+    /** @test */
+    public function it_should_allow_creating_new_folder()
+    {
+        //On providing the path and the name on new folder, folder should get created
+
+
+        //If folder is already created, should return an exception
     }
 }

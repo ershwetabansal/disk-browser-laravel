@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\LocalBrowser;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GetFilesRequest;
+use App\Http\Requests\UploadFileRequest;
 
 class FileController extends Controller
 {
@@ -17,54 +19,22 @@ class FileController extends Controller
      */
     public function index(GetFilesRequest $request)
     {
-        $path = \App\LocalFileBrowser::getFilePath($request->all()['disk'], $request->all()['path']);
-        $files = [];
+        $browser = new LocalBrowser($request->input('disk'));
 
-        if ($path) {
-            $files = \App\LocalFileBrowser::files($path);
-        }
-
-        return $files;
+        return $browser->listFilesIn($request->input('path'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     *
-     * @param Request $request
+     * File upload
+     * @param UploadFileRequest $request
      * @return array
      * @throws \Exception
      */
-    public function store(Request $request)
+    public function store(UploadFileRequest $request)
     {
-        $upload = $request->file('file');
+        $browser = new LocalBrowser($request->input('disk'));
 
-        if (! $upload->isValid()) {
-            throw new \Exception('Invalid file uploaded.');
-        }
-
-        $content = file_get_contents($upload->getRealPath());
-
-        $newFileName = time() . '_' . uniqid() . '.' . $upload->getClientOriginalExtension();
-
-        $path = \App\LocalFileBrowser::getFilePath($request->all()['disk'], $request->all()['path']);
-
-        \App\LocalFileBrowser::uploadFile($path, $newFileName, $content);
-
-        return [
-            'path' => $path . $newFileName,
-            'name' => $newFileName,
-            'size' => \App\LocalFileBrowser::size($path . "/" . $newFileName),
-            'last_modified_date' => \App\LocalFileBrowser::lastModified($path . "/" . $newFileName),
-        ];
+        return $browser->createFileIn($request->input('path'), $request->file('file'));
 
     }
 

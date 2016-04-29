@@ -4,31 +4,55 @@ namespace App\Filesystem;
 
 use App\User;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class File
 {
-    protected $model;
-    protected $name;
-    protected $path;
-    protected $size;
 
-    public function __construct(Model $model)
+    /**
+     * @param UploadedFile $file
+     * @param $fileName
+     * @param $disk
+     * @param string $directory
+     */
+    public static function uploadFile(UploadedFile $file, $fileName, $disk, $directory = '/')
     {
-        $this->model = $model;
+       return Storage::disk($disk)->put($directory . DIRECTORY_SEPARATOR . $fileName, file_get_contents($file->getRealPath()));
     }
 
-    public function size()
+
+    /**
+     * Returns files in a given directory
+     * @param $directory
+     * @return mixed
+     */
+    public static function filesIn($disk, $directory)
     {
-        return \File::size($this->model->path);
+        return collect(Storage::disk($disk)->files($directory));
     }
 
-    public function extension()
+    /**
+     * Returns size of a file
+     * @param $file
+     * @param $disk
+     * @return mixed
+     */
+    public static function getSizeOf($file, $disk)
     {
-        return pathinfo($this->model->path)['extension'];
+        return Storage::disk($disk)->size($file) / 1000;
     }
 
-    public function canBeAccessedBy(User $user)
+    /**
+     * Returns last modified date of a file
+     * @param $file
+     * @param $disk
+     * @return mixed
+     */
+    public static function getLastModifiedOf($file, $disk)
     {
-        return true;
+        return date('d M Y H:i:s', Storage::disk($disk)->lastModified($file));
     }
+
+
 }

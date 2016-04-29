@@ -48,6 +48,19 @@ return [
             'root'   => storage_path('app'),
         ],
 
+        'ea_images' => [
+            'driver' => 'local',
+            'root'   => env('BASE_PATH') . 'public/images',
+            'type'   => 'png,jpg,jpeg',
+        ],
+
+        'ea_publications' => [
+            'driver' => 'local',
+            'root'   => env('BASE_PATH') . 'public/publications',
+            'type'   => 'doc,docx,pdf,xls,xlsx',
+            'relativePath' => '/publications',
+        ],
+
         'ftp' => [
             'driver'   => 'ftp',
             'host'     => 'ftp.example.com',

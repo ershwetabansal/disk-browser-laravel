@@ -16,6 +16,7 @@ Route::group(['prefix' => '/api/v1/'], function () {
     Route::group(['middleware' => ['auth.basic']], function () {
 
         Route::post('directories', 'DirectoryController@index');
+        Route::post('directory/store', 'DirectoryController@store');
         Route::post('files', 'FileController@index');
         Route::post('file/store', 'FileController@store');
 

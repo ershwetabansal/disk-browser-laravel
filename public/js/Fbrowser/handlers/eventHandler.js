@@ -157,6 +157,7 @@ function attachClickEventOnDirectories(dirElement) {
 }
 
 function attachKeysEventOnDirectories(dirElement) {
+    if (dirElement.is('ul'))
 	dirElement.find('> li').keydown(function(event){
 		if ($(event.target).parent().is(dirElement)) {
 			var keys = new KeyHandler(event); 
@@ -230,10 +231,17 @@ function attachCreateDirectoryEvent(url) {
             }
         }
 
-		function success() {
-			reqHandler.getDirHandler().saveDirectory(inputElement);
+		function success(response) {
+            if (response.success == true) {
+                reqHandler.getDirHandler().saveDirectory(inputElement);
+            } else {
+                alert('Directory already exists');
+                reqHandler.getDirHandler().removeDirectory(inputElement);
+            }
+
             $(document).off('click', onOutsideClick);
 		}
+
 		function fail() {
 			reqHandler.getDirHandler().removeDirectory(inputElement);
             $(document).off('click', onOutsideClick);

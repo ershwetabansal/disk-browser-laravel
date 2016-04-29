@@ -1,93 +1,48 @@
 <?php
 
 namespace App\Filesystem;
+
+
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Storage;
 use App\Exceptions\Filesystem\MissingPathException;
 
 class Directory
 {
     /**
-     * @var string $path
+     * Allow to create a new directory
+     * @param $disk
+     * @param $directory
+     * @param $dirName
+     * @return
      */
-    protected $path;
-    /**
-     * @var Filesystem $filesystem
-     */
-    private $filesystem;
-
-    /**
-     * @var array $files All files within the directory.
-     */
-    protected $files = [];
-
-    /**
-     * @var array $directories All sub-directories within the directory.
-     */
-    protected $directories = [];
-
-    /**
-     * @param Filesystem $filesystem
-     * @param string|null $path
-     */
-    public function __construct(Filesystem $filesystem, $path = null)
+    public static function createDirectoryIn($disk, $directory, $dirName)
     {
-        $this->filesystem = $filesystem;
-        $this->path = $path;
+        return Storage::disk($disk)->makeDirectory($directory . "/" . $dirName);
     }
 
     /**
-     * Set the directory path.
-     *
-     * @param string $path
-     * @return $this
+     * Does directory already exists
+     * @param $disk
+     * @param $directory
+     * @param $dirName
+     * @return mixed
      */
-    public function setPath($path)
+    public static function doesDirectoryExistsIn($disk, $directory, $dirName)
     {
-        $this->path = $path;
-        return $this;
+        return Storage::disk($disk)->has($directory . "/" . $dirName);
     }
 
     /**
-     * Getter for path.
-     *
-     * @return string
+     * Returns the sub directories in a particular directory
+     * @param $disk
+     * @param $directory
+     * @return mixed
      */
-    public function path()
+    public static function subDirectoriesIn($disk, $directory)
     {
-        return $this->path;
+        return collect(Storage::disk($disk)->directories($directory));
     }
 
-    /**
-     * @return array
-     */
-    public function files()
-    {
-        $this->guardAgainstInvalidPath();
-
-        $this->files = $this->filesystem->files($this->path);
-        return $this->files;
-    }
-
-    /**
-     * @return array
-     */
-    public function directories()
-    {
-        $this->guardAgainstInvalidPath();
-
-        $this->directories = $this->filesystem->directories($this->path);
-        return $this->directories;
-    }
-
-    /**
-     * @private
-     * @throws MissingPathException
-     */
-    private function guardAgainstInvalidPath()
-    {
-        if (is_null($this->path)) {
-            throw new MissingPathException();
-        }
-    }
 
 }

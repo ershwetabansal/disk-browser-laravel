@@ -2,15 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Filesystem\Directory;
+use App\LocalBrowser;
 use Illuminate\Http\Request;
 
 
 use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GetDirectoriesRequest;
+use App\Http\Requests\CreateNewDirectoryRequest;
 
 class DirectoryController extends Controller
 {
+
     /**
      * Return the list of directories
      * @param $request
@@ -18,38 +22,23 @@ class DirectoryController extends Controller
      */
     public function index(GetDirectoriesRequest $request)
     {
-        $directory = null;
-        $directories = [];
-        if ($request->all()['disk'] == 'assets') {
-            $directory = '/public/assets';
-        }
-
-        if ($directory != null) {
-            $directories = \App\LocalFileBrowser::directoriesStructure($directory);
-        }
-
-        return $directories;
+        $browser = new LocalBrowser($request->input('disk'));
+        return $browser->listDirectoriesIn($request->input('path'));
     }
 
     /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
+     * Create a new directory in the given directory
+     * @param CreateNewDirectoryRequest $request
+     * @return array
      */
-    public function create()
+    public function store(CreateNewDirectoryRequest $request)
     {
-        //
-    }
+        $browser = new LocalBrowser($request->input('disk'));
+        $isDirectoryAdded = $browser->createDirectoryIn($request->input('path'), $request->input('name'));
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        //
+        return [
+            'success' => $isDirectoryAdded,
+        ];
     }
 
     /**
