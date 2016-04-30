@@ -115,7 +115,7 @@
                                     <button id="cancel_file_upload" type="button" class="btn btn-default">Cancel</button>
                                 </div>
                             </form>
-                            <i class="fa fa-spinner fa-spin hidden" id="upload_file_loading"></i>
+                            <div class="text-center hidden" id="upload_file_loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
                         </div>
                         <div id="search-enabled" class="hidden">
                             <label>Search :</label>

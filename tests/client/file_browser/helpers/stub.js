@@ -40,66 +40,30 @@ function getDiskData() {
 function getDirectoryData() {
 	return [
         {
-            name: 'cats',
-            directories: [
-                {
-                    name: '2016',
-                    directories: [
-                        {name: '01'},
-                        {name: '02'},
-                        {name: '03'},
-                        {name: '04'},
-                        {name: '05'},
-                        {name: '06'},
-                        {name: '07'},
-                        {name: '08'},
-                        {name: '09'},
-                        {name: '10'}
-                    ]
-                }
-            ]
+            name: 'cats'
         },
         {
-            name: 'dogs',
-            directories: [
-                {
-                    name: '2016',
-                    directories: [
-                        {name: '01'},
-                        {name: '02'},
-                        {name: '03'},
-                        {name: '04'},
-                        {name: '05'},
-                        {name: '06'},
-                        {name: '07'},
-                        {name: '08'},
-                        {name: '09'},
-                        {name: '10'}
-                    ]
-                }
-            ]
+            name: 'dogs'
         },
         {
-            name: 'monkeys',
-            directories: [
-                {
-                    name: '2016',
-                    directories: [
-                        {name: '01'},
-                        {name: '02'},
-                        {name: '03'},
-                        {name: '04'},
-                        {name: '05'},
-                        {name: '06'},
-                        {name: '07'},
-                        {name: '08'},
-                        {name: '09'},
-                        {name: '10'}
-                    ]
-                }
-            ]
+            name: 'monkeys'
         }
-    ]
+    ];
+}
+
+function getSubDirectoryData() {
+    return [
+                        {name: '01'},
+                        {name: '02'},
+                        {name: '03'},
+                        {name: '04'},
+                        {name: '05'},
+                        {name: '06'},
+                        {name: '07'},
+                        {name: '08'},
+                        {name: '09'},
+                        {name: '10'}
+                    ];
 }
 
 function getFilesData() {
@@ -172,6 +136,7 @@ module.exports = {
 	keyPress : keyPress,
 	getDiskData : getDiskData,
 	getDirectoryData : getDirectoryData,
+    getSubDirectoryData : getSubDirectoryData,
     getFilesData : getFilesData,
 	getSetupObject : getSetupObject
 }

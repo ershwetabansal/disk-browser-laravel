@@ -37,56 +37,17 @@ browser.setup({
                     relative : true
                 }
             }
-            //{
-            //    //For managing the same server folder
-            //    name: 'publications',
-            //    label: 'Publications',
-            //    search_URL: '/asset/file/search',
-            //    path : {
-            //        root : 'http://image-upload.com'
-            //    }
-            //},
-            //
-            //   {
-            //       //For getting root paths in session
-            //       name: 'general',
-            //       label: 'General',
-            //       search_URL: '/asset/file/search',
-            //       path : {
-            //           relative : false,
-            //           cookie : 'root_path'
-            //       }
-            //   },
-            //   {
-            //    //For managing a third party disk with no absolute path
-            //    name: 'S3',
-            //    label: 'AWS S3',
-            //    search_URL: '/asset/file/search',
-            //    path : {
-            //        relative : false,
-            //        absolute : false
-            //    }
-            //}
-
         ]
     },
     directories: {
         list: '/api/v1/directories',
-        //destroy: '/api/v1/directory/destroy',
         create: '/api/v1/directory/store'
-        //update: '/api/v1/directory/update'
     },
     files: {
         list: '/api/v1/files',
-        //destroy: '/api/v1/file/destroy',
         upload: {
             url: '/api/v1/file/store',
-            params: [
-                //{
-                //    name: 'name',
-                //    label: 'File Name'
-                //}
-            ]
+            params:[]
         },
         thumbnail: {
             show : true,
@@ -95,7 +56,6 @@ browser.setup({
             prefix : '',
             suffix : ''
         },
-        update: '/asset/file/store',
         size_unit : 'KB'
     },
     http : {
@@ -105,6 +65,7 @@ browser.setup({
     },
     authentication : "session"
 });
+
 function myFileBrowser(field_id, url, type, win)
 {
     browser.openBrowser({

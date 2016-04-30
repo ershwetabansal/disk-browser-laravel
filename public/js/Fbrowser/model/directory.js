@@ -43,8 +43,6 @@ function loadDirectories(data) {
 
 function showSubDirectories(liElement, directories) {
     if (liElement.find('ul').length == 0 && !isRootDirectory()) {
-        var directory = getDirectoryData(liElement);
-
         if (directories && directories.length > 0) {
             liElement.append($('<ul></ul>'));
             addDirectoriesElements(liElement.find('ul'), directories, false);

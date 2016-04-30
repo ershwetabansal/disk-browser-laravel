@@ -22,7 +22,8 @@ describe("File browser should be able to manage directories and ", function() {
     it("should be able to show directories when any directory is clicked.", function() {
     
     	var directory = element.getDirectories().find('li').eq(1);
-    	setup.getDirHandler().showSubDirectories(directory, stub.getDirectoryData());
+        element.select(directory.closest('ul'), directory);
+    	setup.getDirHandler().showSubDirectories(directory, stub.getSubDirectoryData());
     	
     	expect(directory.find('ul').length).toBe(1);
     
@@ -31,7 +32,7 @@ describe("File browser should be able to manage directories and ", function() {
     it("should be able to hide directories when already sub directories are shown.", function() {
     	
     	var directory = element.getDirectories().find('li').eq(1);
-    	setup.getDirHandler().showSubDirectories(directory, stub.getDirectoryData());
+    	setup.getDirHandler().showSubDirectories(directory, stub.getSubDirectoryData());
     	setup.getDirHandler().hideSubDirectories(directory);
 
     	expect(directory.find('ul').length).toBe(0);
@@ -92,8 +93,9 @@ describe("File browser should be able to manage directories and ", function() {
     it("should be able to verify if child directories are open or not.", function() {
 		
 		var directory = element.getDirectories().find('li').eq(1);
-
-		setup.getDirHandler().showSubDirectories(directory, stub.getDirectoryData());
+        element.select(directory.closest('ul'), directory);
+        
+		setup.getDirHandler().showSubDirectories(directory, stub.getSubDirectoryData());
 		expect(setup.getDirHandler().childDirOpen(directory)).toBe(true);
 
 		setup.getDirHandler().hideSubDirectories(directory);

@@ -102,7 +102,7 @@ function loadDisks() {
 }
 
 function loadDirectories() {
-	makeAjaxRequest(directoriesParam.list, success, fail);
+	makeAjaxRequest(directoriesParam.list, success, fail, true, {path : '/'});
 
 	function success(data) {
         dirHandler.loadDirectories(data);
@@ -336,15 +336,19 @@ function addCommonParametersToFormData(formData) {
 function addCommonParameters(params) {
 
     params = params || {};
-    var disk = diskHandler.getCurrentDisk();
-    if (disk) {
-        params.disk = disk.name;
+    if (!params.disk) {
+	    var disk = diskHandler.getCurrentDisk();
+	    if (disk) {
+	        params.disk = disk.name;
+	    }    	
     }
 
-    var dirPath = dirHandler.getCurrentDirectoryPath();
-    dirPath =  dirPath || '/';
-    if (dirPath) {
-        params.path = dirPath;
+    if (!params.path) {
+	    var dirPath = dirHandler.getCurrentDirectoryPath();
+	    dirPath =  dirPath || '/';
+	    if (dirPath) {
+	        params.path = dirPath;
+	    }    	
     }
 
     return params;
