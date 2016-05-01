@@ -78,6 +78,7 @@ function attachSearchFilesEvent() {
 	    element.getFileSearchOptions().append($(searchLiElement(id, dirName, 'fa-folder-o')));
 	   	element.selectFirst(element.getFileSearchOptions());
 	   	element.getFileSearchOptions().find('#'+id).click(function() {
+	   		element.selectFirst(element.getFileSearchOptions());
 	    	searchFiles(true);
 		});
     }

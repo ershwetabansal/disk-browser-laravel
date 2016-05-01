@@ -330,4 +330,9 @@ $text-top-bottom-padding: 5px;
     margin-bottom: 10px;
   }
 
+  .btn-group {
+    .btn {
+      outline: 0;
+    }
+  }
 }

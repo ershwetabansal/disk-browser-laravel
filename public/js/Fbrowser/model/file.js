@@ -14,7 +14,7 @@ function file() {
 *****************************************************/
 
 	function loadFiles(data) {
-        currentView = 'grid';
+        currentView = currentView || 'grid';
         directory_files_array = data;
         showFiles();
     }
