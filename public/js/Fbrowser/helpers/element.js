@@ -620,28 +620,29 @@ function unselectTableRow(row) {
 }
 
 
-function openModal() {
+function openModal(allowResizing) {
 
     getFileBrowser().modal({
         keyboard: false,
         backdrop: 'static'
     });
 
-    allowModalResize();
-
-    $(window).resize(function(){
+    if (allowResizing == true) {
         allowModalResize();
-    });
 
+        $(window).resize(function(){
+            allowModalResize();
+        });        
+    }
 }
 
 function allowModalResize() {
     var modalContent = getFileBrowser().find('.modal-content');
     
-    if ($(window).width() >= 750){
+    if ($(window).width() >= 800){
         modalContent.resizable({
             handles: 'e, w',
-            minWidth: 750
+            minWidth: 900
         });
 
         getFileBrowser().on('show.bs.modal', function () {

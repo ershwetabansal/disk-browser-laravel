@@ -13,7 +13,7 @@ function browserSetup(setupObject) {
 function openBrowser(details) {
 	if (manager.validateSetupObject()) {
 		manager.load(details.button);
-		element.openModal();
+		element.openModal(details.resize);
 	} else {
 		alert("Please check consoler errors.");
 	}

@@ -87,7 +87,8 @@ function accessBrowser()
             onClick : function(path) {
                 console.log("path :"+path);
             }
-        }
+        },
+        resize : true
     });
 }
 
