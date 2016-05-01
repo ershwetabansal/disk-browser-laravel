@@ -48,13 +48,15 @@ function attachSearchFilesEvent() {
 	element.getSearchBtn().click(searchFiles);
 	element.getSearchCancelBtn().click(closeFileSearch);
 
-	function searchFiles() {
+	function searchFiles(hasAlreadySearchedOnce) {
 		if (element.getSearchInput().val() == '') {
             closeFileSearch();
         } else {
         	element.show(element.getSearchCancelBtn());
         	reqHandler.getFileHandler().searchFiles(element.getSearchInput().val());
-            addFileSearchOptions();
+        	if (hasAlreadySearchedOnce != true) {
+            	addFileSearchOptions();        		
+        	}
         }
 	}
 
@@ -73,10 +75,10 @@ function attachSearchFilesEvent() {
 	    var dirName = reqHandler.getDirHandler().getCurrentDirectory().data.name;
 	    if (!dirName) dirName = 'This directory';
 	    var id = (reqHandler.getDirHandler().isRootDirectory()) ? 'root' : util.slugify(dirName);
-	    element.getFileSearchOptions().append($(searchLiElement(id, dirName)));
+	    element.getFileSearchOptions().append($(searchLiElement(id, dirName, 'fa-folder-o')));
 	   	element.selectFirst(element.getFileSearchOptions());
 	   	element.getFileSearchOptions().find('#'+id).click(function() {
-	    	searchFiles();
+	    	searchFiles(true);
 		});
     }
 
@@ -87,14 +89,14 @@ function attachSearchFilesEvent() {
 	    		var disk = disksParam.details[i];
 	    		var id = 'search_' + util.slugify(disk.label);
 	    		if (disk.search_URL) {
-		    		element.getFileSearchOptions().append($(searchLiElement(id, disk.label)));
+		    		element.getFileSearchOptions().append($(searchLiElement(id, disk.label, 'fa-server')));
 		    		attachDiskSearchEvent(id, disk.search_URL);
 	    		}
 	    	}
 	    } else if (disksParam.search_URL) {
 	    	var disk_name = 'This disk';
 	    	var id = util.slugify(disk_name);
-		   	element.getFileSearchOptions().append($(searchLiElement(id, disk_name)));
+		   	element.getFileSearchOptions().append($(searchLiElement(id, disk_name, 'fa-server')));
 		   	attachDiskSearchEvent(id, diskSearchURL);
 	    }
     }
@@ -114,8 +116,8 @@ function attachSearchFilesEvent() {
 		});
     }
 
-    function searchLiElement(id, name) {
-    	return '<li id="'+id+'">'+name+'</li>';
+    function searchLiElement(id, name, fa_css) {
+    	return '<li id="'+id+'"><i class="fa '+fa_css+'" aria-hidden="true"></i>&nbsp;'+name+'</li>';
     }
 }
 
@@ -127,13 +129,10 @@ function clearSearch() {
 *****************************************************/
 
 function attachDiskElementEvent(callback) {
-	element.getDiskNavbar().find('li').each(function() {
-		$(this).click(function() {
-			element.select(element.getDiskNavbar(), $(this));
-			//TODO Show loading bar
-            reqHandler.loadDirectories();
-            reqHandler.getFileHandler().cleanUpView();
-		});
+	element.getDiskDropdown().on('change', function() {
+		//TODO Show loading bar
+        reqHandler.loadDirectories();
+        reqHandler.getFileHandler().cleanUpView();
 	});
 }
 

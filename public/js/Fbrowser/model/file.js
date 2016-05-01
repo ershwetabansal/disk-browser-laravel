@@ -163,8 +163,8 @@ function file() {
 
     function searchFiles(text) {
         var searchedFiles = [];
-        for (var i=0, len = current_files_array.length; i < len; i++) {
-            var file = current_files_array[i];
+        for (var i=0, len = directory_files_array.length; i < len; i++) {
+            var file = directory_files_array[i];
             if (file.name.toLowerCase().indexOf(text.toLowerCase()) > - 1) {
                 searchedFiles.push(file);
             }
