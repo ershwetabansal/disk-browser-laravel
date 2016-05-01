@@ -132,7 +132,7 @@ function attachDiskElementEvent(callback) {
 	element.getDiskDropdown().on('change', function() {
 		//TODO Show loading bar
         reqHandler.loadDirectories();
-        reqHandler.getFileHandler().cleanUpView();
+        resetView();
 	});
 }
 
@@ -144,7 +144,7 @@ function attachClickEventOnDirectories(dirElement, url) {
 	dirElement.each(function() {
 		var liElement = $(this);
 		liElement.find('> div').click(function() {
-            reqHandler.getFileHandler().cleanUpView();
+            resetView();
 			element.select(element.getDirectories(), liElement);
 
 			if (reqHandler.getDirHandler().childDirOpen(liElement)) {

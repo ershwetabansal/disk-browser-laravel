@@ -82,12 +82,15 @@ function file() {
                 for (var key in reqHandler.getFileResponseParams()) {
                     thElement += '<th id="'+key+'">' + reqHandler.getFileResponseParams()[key] + '<span></span></th>';
                 }
-
                 rowElement.append($(thElement));
                 headerElement.append(rowElement);
 
                 element.getFilesList().append(headerElement);
                 element.getFilesList().append($('<tbody></tbody>'));
+                element.getFilesList().find('thead').find('th').click(function(){
+                    var isAsc = $(this).hasClass('asc');
+                    sortFilesBy($(this).attr('id'), !isAsc);
+                });
             }
         }
 
