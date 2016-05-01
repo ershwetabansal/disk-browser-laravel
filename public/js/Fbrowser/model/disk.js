@@ -31,7 +31,7 @@ function loadDisks(diskData) {
 
     function addDisksElements() {
 
-        var diskElement = element.getDiskNavbar();
+        var diskElement = element.getDiskDropdown();
         diskElement.empty();
         disks = {};
         for (var i=0, len=diskData.length; i < len; i++) {
@@ -41,11 +41,12 @@ function loadDisks(diskData) {
             disk.path = disk.path || defaultPathParam;
             disks[disk.id] = disk;
         }
+        diskElement.find("option:first").attr('selected','selected');
     }
 
     function getDiskNavElement(disk) {
 
-        return '<li role="presentation" id="'+disk.id+'"><a role="tab" data-toggle="tab" >' + disk.label + '</a></li>';
+        return '<option id="'+disk.id+'" value="'+disk.id+'">' + disk.label + '</option>';
     
     }
 
@@ -68,10 +69,9 @@ function noDiskSetup(object) {
 *****************************************************/
 function getCurrentDisk() {
     
-    var selectedDisk = element.getDiskNavbar().find('li.active');
-    if (selectedDisk.length > 0) {
-        var disk_name = selectedDisk.attr('id');
-        return disks[disk_name];
+    var selectedDisk = element.getDiskDropdown().find('option:selected').attr('id');
+    if (selectedDisk) {
+        return disks[selectedDisk];
     } else {
         return disks['disk_1'];
     }

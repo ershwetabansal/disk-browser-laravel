@@ -148,7 +148,6 @@ function setupSortDropdown() {
 ************************************************/
 
 function attachDiskElementEvents() {
-	element.selectFirst(element.getDiskNavbar());
 	eventHandler.attachDiskElementEvent();
 }
 

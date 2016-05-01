@@ -44,6 +44,8 @@
             <div class="modal-body">
                 <div class="form-inline" role="toolbar" aria-label="...">
                     <div class="form-group" role="group" aria-label="...">
+                        <select id="disk_selector" class="form-control">
+                        </select>
                         <button class="btn btn-default" id="fb_create_new_directory">New Folder</button>
                         <button class="btn btn-default" id="upload_file_btn"><i class="fa fa-upload" aria-hidden="true"></i></button>
 
@@ -74,7 +76,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-3 col-xs-3 directories">
-                        <ul id="disk_navbar" class="nav nav-tabs nav-justified"></ul>
+
                         <ul class="list-unstyled" id="directories-list">
                         </ul>
                     </div>

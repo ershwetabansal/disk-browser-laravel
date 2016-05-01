@@ -1,7 +1,7 @@
 var fbElement,
     primaryBtn,
 
-    diskNavbar,
+    diskDropdown,
 
     directoryWindow,
     directoriesList,
@@ -75,13 +75,13 @@ function getPrimarySubmitButton() {
 * Disk Elements
 ************************************************/
 
-function getDiskNavbar() {
+function getDiskDropdown() {
 
-    if (!diskNavbar  || diskNavbar.length == 0) {
-        diskNavbar= getDirectoryWindow().find('#disk_navbar');
+    if (!diskDropdown  || diskDropdown.length == 0) {
+        diskDropdown= getFileBrowser().find('#disk_selector');
     }
 
-    return diskNavbar;
+    return diskDropdown;
 
 }
 
@@ -678,7 +678,7 @@ module.exports = {
     getFileBrowser: getFileBrowser,
     getPrimarySubmitButton: getPrimarySubmitButton,
 
-    getDiskNavbar: getDiskNavbar,
+    getDiskDropdown: getDiskDropdown,
     
     getDirectoryWindow: getDirectoryWindow,
     getDirectories: getDirectories,
