@@ -23,10 +23,19 @@ class UploadFileRequest extends Request
      */
     public function rules()
     {
+        $disks = config('filesystems.disks');
+        $diskName = $this->input('disk');
+
+        $allowedExtensions = '';
+
+        if (isset($disks[$diskName]) && isset($disks[$diskName]['type'])) {
+            $allowedExtensions = $disks[$this->input('disk')]['type'];
+        }
+
         return [
-            'disk'  => 'required|in:' . implode(',',array_keys(config('filesystems.disks'))),
+            'disk'  => 'required|in:' . implode(',',array_keys($disks)),
             'path'  => 'required',
-            'file'  => 'required|mimes:pdf,xls,xlsx,doc,docx,gif,png,jpg,bmp',
+            'file'  => 'required' . (($allowedExtensions != '') ? ('|mimes:' . $allowedExtensions) : ''),
         ];
     }
 }

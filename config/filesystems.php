@@ -51,7 +51,7 @@ return [
         'ea_images' => [
             'driver' => 'local',
             'root'   => env('BASE_PATH') . 'public/images',
-            'type'   => 'png,jpg,jpeg',
+            'type'   => 'png,jpg,jpeg,bmp,tiff,gif',
             'path'   => '/images/',
         ],
 
