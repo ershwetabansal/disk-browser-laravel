@@ -1,5 +1,7 @@
 var fbElement,
     primaryBtn,
+    loadingBar,
+    fileBrowserBody,
 
     diskDropdown,
 
@@ -70,6 +72,24 @@ function getPrimarySubmitButton() {
 
     return primaryBtn;
 }
+
+function getLoadingBar() {
+    if (!loadingBar  || loadingBar.length == 0) {
+        loadingBar= getFileBrowser().find('#loading_bar');
+    }
+
+    return loadingBar;
+}
+
+function getFileBrowserBody() {
+    if (!fileBrowserBody  || fileBrowserBody.length == 0) {
+        fileBrowserBody= getFileBrowser().find('.modal-body');
+    }
+
+    return fileBrowserBody;
+}
+
+
 
 /************************************************
 * Disk Elements
@@ -672,12 +692,21 @@ function focusoutOnEnter(inputElement) {
             inputElement.focusout();
         }
     });
+}
 
+function deactivate(element) {
+    element.addClass('deactivate');
+}
+
+function activate(element) {
+    element.removeClass('deactivate');
 }
 
 module.exports = {
     getFileBrowser: getFileBrowser,
     getPrimarySubmitButton: getPrimarySubmitButton,
+    getLoadingBar: getLoadingBar,
+    getFileBrowserBody: getFileBrowserBody,
 
     getDiskDropdown: getDiskDropdown,
     
@@ -740,5 +769,7 @@ module.exports = {
     show: show,
     hide: hide,
     openModal: openModal,
-    closeModal: closeModal
+    closeModal: closeModal,
+    activate: activate,
+    deactivate: deactivate
 };

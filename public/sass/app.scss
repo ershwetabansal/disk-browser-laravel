@@ -335,4 +335,12 @@ $text-top-bottom-padding: 5px;
       outline: 0;
     }
   }
+
+  .activate {
+    pointer-events: initial;
+  }
+
+  .deactivate {
+    pointer-events: none;
+  }
 }

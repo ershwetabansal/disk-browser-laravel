@@ -291,10 +291,13 @@ function makeAjaxRequest(url, successCallback, failureCallback, cache, data, isU
     }
     var params = (isUpload != true) ? addCommonParameters(data) : addCommonParametersToFormData(data);
 
+    showLoadingBar(true);
     $.ajax(getAjaxParameters()).success(function (data) {
         if (successCallback) successCallback(data);
+        showLoadingBar(false);
     }).fail(function () {
         if (failureCallback) failureCallback();
+        showLoadingBar(false);
     });
 
     function getAjaxParameters() {
@@ -322,6 +325,15 @@ function makeAjaxRequest(url, successCallback, failureCallback, cache, data, isU
 
 }
 
+function showLoadingBar(show) {
+    if (show == true) {
+        element.show(element.getLoadingBar());
+        element.deactivate(element.getFileBrowserBody());
+    } else {
+        element.hide(element.getLoadingBar());
+        element.activate(element.getFileBrowserBody());
+    }
+}
 
 function addCommonParametersToFormData(formData) {
 	var params = addCommonParameters();

@@ -38,7 +38,9 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h4 class="modal-title pull-left" id="myModalLabel">File Manager</h4>
+                <h4 class="modal-title pull-left" id="myModalLabel">File Manager
+                    <i id="loading_bar" class="fa fa-spinner fa-spin hidden"></i>
+                </h4>
                 <div role="button" class="pull-right" data-dismiss="modal">x</div>
             </div>
             <div class="modal-body">
