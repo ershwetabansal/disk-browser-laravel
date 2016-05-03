@@ -3,3 +3,6 @@ storage
 node_modules
 .idea
 .env
+public/app/build
+public/publications
+public/images
