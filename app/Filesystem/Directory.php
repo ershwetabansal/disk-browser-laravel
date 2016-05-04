@@ -29,9 +29,6 @@ class Directory
      */
     public static function doesDirectoryExist($directoryName, $disk, $path = '/')
     {
-        var_dump($disk);
-        var_dump($path);
-        var_dump(Storage::disk($disk)->has($path . DIRECTORY_SEPARATOR . $directoryName));
         return Storage::disk($disk)->has($path . DIRECTORY_SEPARATOR . $directoryName);
     }
 
@@ -46,5 +43,29 @@ class Directory
         return collect(Storage::disk($disk)->directories($path));
     }
 
+    public static function allDirectoriesIn($disk, $path = '/')
+    {
+        return Storage::disk($disk)->allDirectories($path);
+    }
 
+    public static function getDirectoryMetaData($directory, $disk)
+    {
+        $directoryData = [];
+
+        $prefix = \App\DiskSpecifics::getPathPrefixFor($disk);
+        $directoryData['name'] = self::getNameFromPath($directory);
+        $directoryData['path'] = (strpos($directory, '/') !== 0) ? $prefix . $directory : $directory;
+        return $directoryData;
+    }
+
+    /**
+     * Returns name from a given path string
+     * @param $path
+     * @return mixed
+     */
+    private static function getNameFromPath($path)
+    {
+        $result = array_reverse(explode('/', $path));
+        return $result[0];
+    }
 }

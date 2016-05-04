@@ -32,18 +32,11 @@ class LocalBrowser implements DiskBrowserContract
         $fileNames = File::filesIn($this->disk, $directory);
         $files = [];
         foreach( $fileNames as $file) {
-
-            $fileData = [];
-            $fileData['name'] = self::getNameFromPath($file);
-            if (substr($fileData['name'],0,1) != '.') {
-                $fileData['path'] = DiskSpecifics::getPathPrefixFor($this->disk) . $file;
-                $fileData['size'] = File::getSizeOf($file, $this->disk);
-                $fileData['modified_at'] = File::getLastModifiedOf($file, $this->disk);
-
-                $files[] = $fileData;
+            $fileMetaData = File::getFileMetaData($file, $this->disk);
+            if ($fileMetaData != []) {
+                $files[] = $fileMetaData;
             }
         }
-
         return $files;
     }
 
@@ -58,12 +51,7 @@ class LocalBrowser implements DiskBrowserContract
         $directoriesList = [];
 
         foreach( $directories as $directory ) {
-
-            $dirData = [];
-            $dirData['path'] = $directory;
-            $dirData['name'] = self::getNameFromPath($directory);
-
-            $directoriesList[] = $dirData;
+            $directoriesList[] = Directory::getDirectoryMetaData($directory, $this->disk);
         }
 
         return $directoriesList;
@@ -81,10 +69,7 @@ class LocalBrowser implements DiskBrowserContract
         $isDirectoryAdded = Directory::createDirectory($name, $this->disk, $path );
 
         if ($isDirectoryAdded == true) {
-            $directoryDetails = [
-                'name' => $name,
-                'path' => $path . '/' . $name,
-            ];
+            $directoryDetails = Directory::getDirectoryMetaData($path . '/' . $name, $this->disk);
         }
         return $directoryDetails;
     }
@@ -108,15 +93,40 @@ class LocalBrowser implements DiskBrowserContract
         $fileDetails = [];
 
         if ($isFileUploaded == true) {
-            $fileDetails = ['path' => $path . DIRECTORY_SEPARATOR . $newFileName,
-                'name' => $newFileName,
-                'size' => File::getSizeOf($path . DIRECTORY_SEPARATOR . $newFileName, $this->disk),
-                'last_modified_date' => File::getLastModifiedOf($path . DIRECTORY_SEPARATOR . $newFileName, $this->disk),
-            ];
+            $fileDetails = File::getFileMetaData($path . DIRECTORY_SEPARATOR . $newFileName, $this->disk);
         }
 
         return $fileDetails;
 
+    }
+
+    public function searchDisk($searchedWord)
+    {
+        $files = File::allFilesIn($this->disk);
+        $directories = Directory::allDirectoriesIn($this->disk);
+        
+        $searchedFiles = [];
+        foreach ($files as $file) {
+            if (strpos(self::getNameFromPath($file), $searchedWord) !== false) {
+                var_dump($file);
+                $fileMetaData = File::getFileMetaData($file, $this->disk);
+                var_dump($fileMetaData);
+                if ($fileMetaData != []) {
+                    $searchedFiles[] = $fileMetaData;
+                }
+            }
+        }
+        
+        $searchedDirectories = [];
+        foreach ($directories as $directory) {
+            if (strpos(self::getNameFromPath($directory), $searchedWord) !== false) {
+                $searchedDirectories[] = Directory::getDirectoryMetaData($directory, $this->disk);
+            }
+        }
+        return [
+            'files' => $searchedFiles,
+            'directories' => $searchedDirectories,
+        ];
     }
 
     /**
@@ -124,7 +134,7 @@ class LocalBrowser implements DiskBrowserContract
      * @param $path
      * @return mixed
      */
-    public static function getNameFromPath($path)
+    private static function getNameFromPath($path)
     {
         $result = array_reverse(explode('/', $path));
         return $result[0];

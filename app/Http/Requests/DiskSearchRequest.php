@@ -2,10 +2,9 @@
 
 namespace App\Http\Requests;
 
-use App\Filesystem\Directory;
 use App\Http\Requests\Request;
 
-class CreateNewDirectoryRequest extends Request
+class DiskSearchRequest extends Request
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -28,14 +27,7 @@ class CreateNewDirectoryRequest extends Request
 
         return [
             'disk'  => 'required|in:' . implode(',',array_keys($disks)),
-            'name'  => 'required|directory_not_exists',
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'name.directory_not_exists' => 'Directory already exists'
+            'search'  => 'required',
         ];
     }
 }

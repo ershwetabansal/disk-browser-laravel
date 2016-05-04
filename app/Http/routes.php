@@ -13,14 +13,15 @@
 
 Route::group(['prefix' => '/api/v1/'], function () {
 
-    //Route::group(['middleware' => ['auth.basic']], function () {
+    Route::group(['middleware' => ['auth']], function () {
 
         Route::post('directories', 'DirectoryController@index');
         Route::post('directory/store', 'DirectoryController@store');
         Route::post('files', 'FileController@index');
         Route::post('file/store', 'FileController@store');
+        Route::post('disk/search', 'DiskController@search');
 
-   // });
+   });
 });
 
 // Authentication routes...

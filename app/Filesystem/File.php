@@ -54,5 +54,34 @@ class File
         return date('Y-m-d H:i:s', Storage::disk($disk)->lastModified($file));
     }
 
+    public static function allFilesIn($disk, $path = '/')
+    {
+        return Storage::disk($disk)->allFiles($path);
+    }
 
+    public static function getFileMetaData($file, $disk)
+    {
+        $fileData = [];
+
+        $fileName = self::getNameFromPath($file);
+        if (substr($fileName,0,1) != '.') {
+            $fileData['name'] = $fileName;
+            $fileData['path'] = \App\DiskSpecifics::getPathPrefixFor($disk) . $file;
+            $fileData['size'] = self::getSizeOf($file, $disk);
+            $fileData['modified_at'] = self::getLastModifiedOf($file, $disk);
+        }
+
+        return $fileData;
+    }
+
+    /**
+     * Returns name from a given path string
+     * @param $path
+     * @return mixed
+     */
+    private static function getNameFromPath($path)
+    {
+        $result = array_reverse(explode('/', $path));
+        return $result[0];
+    }
 }

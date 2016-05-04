@@ -4,12 +4,12 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 
-class FileBrowserTest extends TestCase
+class DiskBrowserTest extends TestCase
 {
 
-    use DatabaseTransactions;
+    use WithoutMiddleware, DatabaseTransactions;
 
-    private $testDirectory = 'my_test_directory';
+    private $testDirectory = 'elephants';
 
     public function setUp()
     {
@@ -44,17 +44,17 @@ class FileBrowserTest extends TestCase
 
     }
 
+    /** @test */
     public function it_prevents_use_by_guests()
     {
-        $this->be(null);
 
-        $this->post('whatever')->assertResponseStatus(401);
+        $this->post('/api/v1/directories', [])
+            ->assertResponseStatus(302);
 
-        // Assert errors etc whatever
-
-        $this->be(factory(\App\User::class)->create());
-
-        $this->post('whatever')->assertResponseStatus(200);
+        $user = factory(\App\User::class)->create();
+        
+        $this->be($user);
+        $this->post('/api/v1/directories')->assertResponseStatus(200);
         
     }
 
@@ -72,14 +72,14 @@ class FileBrowserTest extends TestCase
                 // Then I see the directories are as follows
                 ->seeJson([
                     'name' => 'cats',
-                    'path' => 'cats',
+                    'path' => '/cats',
                 ])
                 ->seeJson([
                     'name' => 'monkeys',
-                    'path' => 'monkeys'
+                    'path' => '/monkeys'
                 ])->seeJson([
                     'name' => 'dogs',
-                    'path' => 'dogs'
+                    'path' => '/dogs'
                 ])
 
                 // And there are only three directories returned
@@ -97,11 +97,11 @@ class FileBrowserTest extends TestCase
         $this->post('/api/v1/directories', ['disk' => 'integration_tests', 'path' => '/monkeys'])
             ->seeJson([
                 'name' => 'angry',
-                'path' => 'monkeys/angry'
+                'path' => '/monkeys/angry'
             ])
             ->seeJson([
                 'name' => 'cute',
-                'path' => 'monkeys/cute'
+                'path' => '/monkeys/cute'
             ])
 
             // And there are only two directories returned.
@@ -122,7 +122,7 @@ class FileBrowserTest extends TestCase
             // Then I see the following directory
             ->seeJson([
                 'name' => 'trained',
-                'path' => 'dogs/puppies/trained',
+                'path' => '/dogs/puppies/trained',
             ])
 
             // And there is only one directory returned.
@@ -144,23 +144,25 @@ class FileBrowserTest extends TestCase
                 'name' => 'i-love-this-dog.jpg',
                 'path' => '/i-love-this-dog.jpg',
                 'size' => 0,
-                'modified_at' => '2016-05-04 13:58:11',
             ])
-            ->seeJson([
+            ->seeJsonContains([
                 'name' => 'my-dog.jpg',
                 'path' => '/my-dog.jpg',
                 'size' => 0,
-                'modified_at' => '2016-05-04 13:58:11',
             ])
-            ->seeJson([
+            ->seeJsonContains([
                 'name' => 'my-cat.jpg',
                 'path' => '/my-cat.jpg',
                 'size' => 0,
-                'modified_at' => '2016-05-04 13:58:11',
-            ])
+            ]);
+        
+        $response = $this->response->content();
 
-            // And there are total three files returned.
-            ->assertCount(3, json_decode($this->response->content()));
+        //And Json contains modified_at variable along with other parameters
+        $this->assertContains('modified_at', $response);
+
+        // And there are total three files returned.
+        $this->assertCount(3, json_decode($response));
 
     }
 
@@ -180,11 +182,15 @@ class FileBrowserTest extends TestCase
                 'name' => 'fat_cat.png',
                 'path' => '/cats/fat_cat.png',
                 'size' => 0,
-                'modified_at' => '2016-05-04 15:32:19',
-            ])
+            ]);
 
-            // And there is total one file returned.
-            ->assertCount(1, json_decode($this->response->content()));
+        $response = $this->response->content();
+
+        //And Json contains modified_at variable along with other parameters
+        $this->assertContains('modified_at', $response);
+
+        // And there is total one file returned.
+        $this->assertCount(1, json_decode($response));
 
     }
 
@@ -204,17 +210,20 @@ class FileBrowserTest extends TestCase
                 'name' => 'cute_and_trained_puppies.jpg',
                 'path' => '/dogs/puppies/trained/cute_and_trained_puppies.jpg',
                 'size' => 0,
-                'modified_at' => '2016-05-04 15:21:57',
             ])
             ->seeJson([
                 'name' => 'trained_puppies.jpg',
                 'path' => '/dogs/puppies/trained/trained_puppies.jpg',
                 'size' => 0,
-                'modified_at' => '2016-05-04 15:21:46',
-            ])
+            ]);
 
-            // And there are total two files returned.
-            ->assertCount(2, json_decode($this->response->content()));
+        $response = $this->response->content();
+
+        //And Json contains modified_at variable along with other parameters
+        $this->assertContains('modified_at', $response);
+
+        // And there are total two files returned.
+        $this->assertCount(2, json_decode($response));
 
     }
 
@@ -243,17 +252,17 @@ class FileBrowserTest extends TestCase
     }
 
 
-
+    /** @test */
     public function it_can_create_a_directory_within_a_given_directory_of_a_given_disk()
     {
         // Given there is a disk named 'integration_tests'.
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/directory/store with a directory name
+        // And I make a POST request to /api/v1/directory/store with a directory name
         $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => $this->testDirectory]);
 
-        // And make another request to add a directory inside the previously created directory
+        // When I make another request to add a directory inside the previously created directory
         $this->post('/api/v1/directory/store', [
             'disk' => 'integration_tests',
             'name' => $this->testDirectory,
@@ -269,8 +278,6 @@ class FileBrowserTest extends TestCase
                 ]
             ]);
 
-        $this->assertTrue($this->doesExist('/' . $this->testDirectory));
-
         $this->assertTrue($this->doesExist('/' . $this->testDirectory . '/' . $this->testDirectory));
 
     }
@@ -278,31 +285,39 @@ class FileBrowserTest extends TestCase
     /** @test */
     public function it_does_not_allow_a_directory_to_be_created_if_a_directory_with_the_same_name_already_exists()
     {
-        //When I hit the create directory API, it should create a new directory
+        // Given there is a disk named 'integration_tests'.
 
-        $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => 'my-new-folder'])
-            ->seeJson([
-                'success' => true,
-                'directory' => [
-                    'name' => 'my-new-folder',
-                    'path' => ' as saf a',
-                ]
-            ])
-        ;
+        // And it has the usual directory structure.
 
-        $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => 'my-new-folder'])
+        // And I make a POST request to /api/v1/directory/store with a directory name
+        $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => $this->testDirectory]);
+
+        // When I make another request to add the directory with the same name as used in previous step
+        
+
+        $this->post('/api/v1/directory/store', 
+                    ['disk' => 'integration_tests', 'name' => $this->testDirectory],
+                    [
+                        'X-Content-Type-Options' => 'application/json',
+                        'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
+                    ]
+            )
+            //Then I see an error '422' and the error message
             ->seeJson([
-                'success' => false,
-                'errors' => [
-                    'A directory already exists with this name',
-                ]
+                "name" => [ "Directory already exists" ]
             ])->assertResponseStatus(422);
 
     }
+
+
     /** @test */
-    public function it_stores_a_file_in_the_root_directory_of_a_given_disk()
+    public function it_stores_a_file_in_the_given_directory_of_a_given_disk()
     {
-        //Upload a local file to disk 'integration_tests'
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // And there is a local file, ready for upload on the disk.
         $localFile = env('BASE_PATH') . 'tests/stubs/files/test.jpg';
 
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(
@@ -314,40 +329,44 @@ class FileBrowserTest extends TestCase
             true
         );
 
+        // When I make a POST request to upload the file
         $response = $this->call('POST', '/api/v1/file/store', [
-            'disk' => 'integration_tests',
-            'path' => '/upload'
-        ],
+                'disk' => 'integration_tests',
+                'path' => '/' . $this->testDirectory
+            ],
             [],
             ['file' => $uploadedFile]
         );
 
-        //Response should contain path, name, size and last modified date of the uploaded file
+        //Then response should contain path, name, size and last modified date of the uploaded file
         $this->assertContains('name', $response->content());
         $this->assertContains('path', $response->content());
         $this->assertContains('size', $response->content());
-        $this->assertContains('last_modified_date', $response->content());
+        $this->assertContains('modified_at', $response->content());
 
         //Uploaded file should exist physically
-        $this->doesExist($response->content()['path']);
+        $this->doesExist(json_decode($response->content(), true)['path']);
 
         //Uploaded file name should contain the slugified version of original file name partly
         $this->assertContains(str_slug(preg_replace('/\\.[^.\\s]{3,4}$/', '', $uploadedFile->getClientOriginalName())),
-            $response->getContent()->name);
+            json_decode($response->getContent(), true)['name']);
 
         //Uploaded file name should have a random suffix
-
-        $this->assertEquals('/[a-zA-z0-9]/', array_reverse(explode('_', $response->getContent()['name']))[0]);
+        $this->assertRegExp('/[a-zA-z0-9.]+/', array_values(array_reverse(explode('_', json_decode($response->getContent(), true)['name'])))[0]);
 
         //Uploaded file name should have the extension same as that of the uploaded file
-        $this->assertContains($uploadedFile->getClientOriginalExtension(), $response->getContent()['name']);
+        $this->assertContains($uploadedFile->getClientOriginalExtension(), json_decode($response->getContent(), true)['name']);
 
     }
 
     /** @test */
-    public function it_should_not_store_file_in_a_directory_if_extension_is_not_from_allowed_extensions_list()
+    public function it_does_not_allow_to_store_file_in_a_directory_if_extension_is_not_from_allowed_extensions_list()
     {
-        //Upload a local file to disk 'integration_tests' with mimeType other than 'jpeg/png'
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // And there is a local file, ready for upload on the disk.
         $localFile = env('BASE_PATH') . 'tests/stubs/files/spreadsheet.xlsx';
 
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(
@@ -359,10 +378,11 @@ class FileBrowserTest extends TestCase
             true
         );
 
+        // When I make a POST request to upload the file
         $response = $this->call(
             'POST',
             '/api/v1/file/store',
-            ['disk' => 'integration_tests', 'path' => '/upload'],
+            ['disk' => 'integration_tests'],
             [],
             ['file' => $uploadedFile],
             [
@@ -375,6 +395,7 @@ class FileBrowserTest extends TestCase
         $this->seeJsonContains([
             'file' => ['The file must be a file of type: jpeg, png.']
         ]);
+
         $this->assertEquals('422', $response->getStatusCode());
 
     }
@@ -382,68 +403,53 @@ class FileBrowserTest extends TestCase
     /** @test */
     public function it_searches_files_and_directories_in_a_given_disk()
     {
-       // Given there is a disk called 'integration_tests'
+       
+        // Given there is a disk called 'integration_tests'
 
-       // And the disk has the following structure:
+        // And the disk has the usual directory structure:
 
-       /*
-        | .
-        |  /images
-        |       1461869658-41737717-graph002.png
-        |       /graphs
-        |           99999-graph003.png
-        |  /publications
-        |       /2016
-        |           /01
-        |               55555-graph001.png
-        |  1461869658-78982514-graph004.png
-        |
-        */
+        // When I search for 'cute' word
+        $this->post('/api/v1/disk/search', ['disk' => 'integration_tests', 'search' => 'cute'])
 
-        // When I search for 'cat'
-        // Then I see:
-
-        $result = [
-            'directories' => [
-                '/images/graphs'
-            ],
-            'files' => [
+            // I should see all the directories and files containing word 'cat'
+            ->seeJson(
                 [
-                    'name' => '1461869658-41737717-graph002.png',
-                    'path' => '/images/1461869658-41737717-graph002.png'
-                ],
-                [
-                    'name' => '55555-graph001.png',
-                    'path' => '/publications/2016/01/55555-graph001.png'
-                ],
-                [
-                    'name' => '1461869658-78982514-graph004.png',
-                    'path' => '/1461869658-78982514-graph004.png'
-                ],
-                [
-                    'name' => '99999-graph003.png',
-                    'path' => '/images/graphs/99999-graph003.png'
+                    'directories' => [
+                        [
+                            'name' => 'cute',
+                            'path' => '/cats/cute',
+                        ],
+                        [
+                            'name' => 'cute',
+                            'path' => '/monkeys/cute',
+                        ]
+                    ],
                 ]
-            ],
-        ];
+            )
+            ->seeJson(
+                [
+                    'files' => [
+                        [
+                            'name' => 'cute_cat.png',
+                            'path' => '/cats/cute/cute_cat.png',
+                        ],
+                        [
+                            'name' => 'cute_puppies.jpg',
+                            'path' => '/dogs/puppies/cute_puppies.jpg',
+                        ],
+                        [
+                            'name' => 'cute_and_trained_puppies.jpg',
+                            'path' => '/dogs/puppies/trained/cute_and_trained_puppies.jpg',
+                        ],
+                        [
+                            'name' => 'cute_monkey.png',
+                            'path' => '/monkeys/cute/cute_monkey.png',
+                        ]
+                    ]
+                ]
+            );
 
-        $this->post('/api/v1/disk/search', ['disk' => 'integration_tests', 'search' => 'graph'])
-            ->seeJson($result)
-        ;
 
-        $this->post('/api/v1/disk/search', ['disk' => 'integration_tests', 'search' => 'test'])
-            ->seeJson([])
-        ;
-    }
-
-
-    /**
-     * Delete all the files inside a directory
-     */
-    private function clearUploadedFiles()
-    {
-        Storage::disk('integration_tests')->deleteDirectory('upload');
-        Storage::disk('integration_tests')->makeDirectory('upload');
     }
 
     /**
@@ -452,7 +458,9 @@ class FileBrowserTest extends TestCase
      */
     private function deleteDirectory($directory)
     {
-        Storage::disk('integration_tests')->deleteDirectory($directory);
+        if ($this->doesExist($directory)) {
+            Storage::disk('integration_tests')->deleteDirectory($directory);
+        }
     }
 
     /**
@@ -464,14 +472,5 @@ class FileBrowserTest extends TestCase
     {
        return Storage::disk('integration_tests')->has($path);
     }
-
-    // It can create a new directory in a given directory
-    // It can store a file in a given directory
-
-    // Integration
-    // It doesn't allow a directory to be created with the same name as another in a given directory
-
-    // Unit
-    // It generates a unique file name when uploading a file
 
 }
