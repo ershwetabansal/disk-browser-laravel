@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\DiskSpecifics;
 use App\Http\Requests\Request;
 
 class UploadFileRequest extends Request
@@ -26,16 +27,12 @@ class UploadFileRequest extends Request
         $disks = config('filesystems.disks');
         $diskName = $this->input('disk');
 
-        $allowedExtensions = '';
-
-        if (isset($disks[$diskName]) && isset($disks[$diskName]['type'])) {
-            $allowedExtensions = $disks[$this->input('disk')]['type'];
-        }
+        $allowedExtensions = DiskSpecifics::getAllowedFileMimeTypesFor($diskName);
 
         return [
             'disk'  => 'required|in:' . implode(',',array_keys($disks)),
             'path'  => 'required',
-            'file'  => 'required' . (($allowedExtensions != '') ? ('|mimes:' . $allowedExtensions) : ''),
+            'file'  => 'required' . (($allowedExtensions != '' && $allowedExtensions != null) ? ('|mimes:' . $allowedExtensions) : ''),
         ];
     }
 }

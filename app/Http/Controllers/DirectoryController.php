@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Filesystem\Directory;
+
 use App\LocalBrowser;
-use Illuminate\Http\Request;
-
-
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GetDirectoriesRequest;
 use App\Http\Requests\CreateNewDirectoryRequest;
@@ -23,6 +21,7 @@ class DirectoryController extends Controller
     public function index(GetDirectoriesRequest $request)
     {
         $browser = new LocalBrowser($request->input('disk'));
+
         return $browser->listDirectoriesIn($request->input('path'));
     }
 
@@ -33,11 +32,14 @@ class DirectoryController extends Controller
      */
     public function store(CreateNewDirectoryRequest $request)
     {
+
+
         $browser = new LocalBrowser($request->input('disk'));
-        $isDirectoryAdded = $browser->createDirectoryIn($request->input('path'), $request->input('name'));
+        $directoryDetails = $browser->createDirectory($request->input('name'), $request->input('path'));
 
         return [
-            'success' => $isDirectoryAdded,
+            'success' => ($directoryDetails != null && isset($directoryDetails)),
+            'directory' => $directoryDetails,
         ];
     }
 

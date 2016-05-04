@@ -295,9 +295,10 @@ function makeAjaxRequest(url, successCallback, failureCallback, cache, data, isU
     $.ajax(getAjaxParameters()).success(function (data) {
         if (successCallback) successCallback(data);
         showLoadingBar(false);
-    }).fail(function () {
-        if (failureCallback) failureCallback();
+    }).fail(function (response) {
+        if (failureCallback) failureCallback(response);
         showLoadingBar(false);
+        updateError(response);
     });
 
     function getAjaxParameters() {
@@ -333,6 +334,18 @@ function showLoadingBar(show) {
         element.hide(element.getLoadingBar());
         element.activate(element.getFileBrowserBody());
     }
+}
+
+function updateError(response) {
+    element.getErrorMessagePlaceHolder().empty();
+    var message = 'Request could not be completed.';
+
+    if (httpParams.error) {
+        message = httpParams.error(response.status, JSON.parse(response.responseText)) || message;
+    }
+
+    element.getErrorMessagePlaceHolder().text(message);
+    console.log(JSON.stringify(response.responseJSON));
 }
 
 function addCommonParametersToFormData(formData) {

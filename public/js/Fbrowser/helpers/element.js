@@ -1,6 +1,7 @@
 var fbElement,
     primaryBtn,
     loadingBar,
+    errorMessage,
     fileBrowserBody,
 
     diskDropdown,
@@ -87,6 +88,14 @@ function getFileBrowserBody() {
     }
 
     return fileBrowserBody;
+}
+
+function getErrorMessagePlaceHolder() {
+    if (!errorMessage  || errorMessage.length == 0) {
+        errorMessage= getFileBrowser().find('#error_message');
+    }
+
+    return errorMessage;
 }
 
 
@@ -707,6 +716,7 @@ module.exports = {
     getPrimarySubmitButton: getPrimarySubmitButton,
     getLoadingBar: getLoadingBar,
     getFileBrowserBody: getFileBrowserBody,
+    getErrorMessagePlaceHolder: getErrorMessagePlaceHolder,
 
     getDiskDropdown: getDiskDropdown,
     

@@ -51,7 +51,7 @@ class File
      */
     public static function getLastModifiedOf($file, $disk)
     {
-        return date('d M Y H:i:s', Storage::disk($disk)->lastModified($file));
+        return date('Y-m-d H:i:s', Storage::disk($disk)->lastModified($file));
     }
 
 

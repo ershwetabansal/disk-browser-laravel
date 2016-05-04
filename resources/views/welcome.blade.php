@@ -41,7 +41,7 @@
                 <h4 class="modal-title pull-left" id="myModalLabel">File Manager
                     <i id="loading_bar" class="fa fa-spinner fa-spin hidden"></i>
                 </h4>
-                <div role="button" class="pull-right" data-dismiss="modal">x</div>
+                <div id="error_message" class="text-center error"></div>
             </div>
             <div class="modal-body">
                 <div class="form-inline" role="toolbar" aria-label="...">
@@ -148,6 +148,7 @@
 
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.js"></script>
 <script src="//cdn.tinymce.com/4/tinymce.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.8.3/underscore-min.js"></script>
 <script src="app/build/js/bundle.js"></script>
 <script src="js/editor.js"></script>
 

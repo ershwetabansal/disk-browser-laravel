@@ -61,6 +61,15 @@ browser.setup({
     http : {
         headers : {
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+        },
+        error : function(status, response) {
+            console.log(response);
+            if (status == '422') {
+                for (var key in response) {
+                    return response[key][0];
+                }
+            }
+            return 'Error encountered. ';
         }
     },
     authentication : "session"

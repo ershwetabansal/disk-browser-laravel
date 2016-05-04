@@ -16,25 +16,25 @@ interface DiskBrowserContract
 
     /**
      * List all directories in a given directory
-     * @param $directory
+     * @param string $directory
      * @return array
      */
     public function listDirectoriesIn($directory);
 
     /**
      * Create a new directory
-     * @param $directory
-     * @param $name
+     * @param string $path
+     * @param string $name
      * @return object
      */
-    public function createDirectoryIn($directory, $name);
+    public function createDirectory($name, $path);
 
     /**
      * Create file in a directory
-     * @param $directory
      * @param UploadedFile $file
+     * @param string $path
      * @return mixed
      */
-    public function createFileIn($directory, UploadedFile $file);
+    public function createFile(UploadedFile $file, $path);
 
 }

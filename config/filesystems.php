@@ -51,15 +51,16 @@ return [
         'ea_images' => [
             'driver' => 'local',
             'root'   => env('BASE_PATH') . 'public/images',
-            'type'   => 'png,jpg,jpeg,bmp,tiff,gif',
-            'path'   => '/images/',
         ],
 
         'ea_publications' => [
             'driver' => 'local',
             'root'   => env('BASE_PATH') . 'public/publications',
-            'type'   => 'doc,docx,pdf,xls,xlsx',
-            'path'   => '/publications/',
+        ],
+
+        'integration_tests' => [
+            'driver' => 'local',
+            'root'   => env('BASE_PATH') . 'tests/stubs/disk',
         ],
 
         'ftp' => [

@@ -23,8 +23,10 @@ class GetDirectoriesRequest extends Request
      */
     public function rules()
     {
+        $disks = config('filesystems.disks');
+
         return [
-            'disk'  => 'required',
+            'disk'  => 'required|in:' . implode(',',array_keys($disks)),
         ];
     }
 }

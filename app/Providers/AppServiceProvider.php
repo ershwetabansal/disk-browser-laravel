@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Filesystem\Directory;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -13,7 +14,17 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        \Validator::extend('directoryNotExists', function($attribute, $value, $parameters, $validator) {
+
+            var_dump($attribute);
+            var_dump($value);
+            var_dump($parameters);
+            var_dump($validator->getData()['disk']);
+            var_dump(Directory::doesDirectoryExist($value, $validator->getData()['disk'], $validator->getData()['path']));
+//            return true;
+            return (Directory::doesDirectoryExist($value, $validator->getData()['disk'], $validator->getData()['path']) == false);
+
+        });
     }
 
     /**
@@ -23,6 +34,6 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+
     }
 }

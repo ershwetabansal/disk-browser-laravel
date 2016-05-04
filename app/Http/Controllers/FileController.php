@@ -34,7 +34,7 @@ class FileController extends Controller
     {
         $browser = new LocalBrowser($request->input('disk'));
 
-        return $browser->createFileIn($request->input('path'), $request->file('file'));
+        return $browser->createFile($request->file('file'), $request->input('path'));
 
     }
 

@@ -343,4 +343,11 @@ $text-top-bottom-padding: 5px;
   .deactivate {
     pointer-events: none;
   }
+
+  .error {
+    color: darkred;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+  }
 }

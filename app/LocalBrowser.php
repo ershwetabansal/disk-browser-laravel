@@ -27,7 +27,7 @@ class LocalBrowser implements DiskBrowserContract
      * @param string $directory
      * @return array
      */
-    public function listFilesIn($directory)
+    public function listFilesIn($directory = '/')
     {
         $fileNames = File::filesIn($this->disk, $directory);
         $files = [];
@@ -36,9 +36,9 @@ class LocalBrowser implements DiskBrowserContract
             $fileData = [];
             $fileData['name'] = self::getNameFromPath($file);
             if (substr($fileData['name'],0,1) != '.') {
-                $fileData['path'] = config('filesystems.disks.ea_images.path') . $file;
+                $fileData['path'] = DiskSpecifics::getPathPrefixFor($this->disk) . $file;
                 $fileData['size'] = File::getSizeOf($file, $this->disk);
-                $fileData['last_modified_date'] = File::getLastModifiedOf($file, $this->disk);
+                $fileData['modified_at'] = File::getLastModifiedOf($file, $this->disk);
 
                 $files[] = $fileData;
             }
@@ -49,19 +49,19 @@ class LocalBrowser implements DiskBrowserContract
 
     /**
      * List all directories in a given directory
-     * @param $directory
+     * @param $path
      * @return array
      */
-    public function listDirectoriesIn($directory)
+    public function listDirectoriesIn($path = '/')
     {
-        $directories = Directory::subDirectoriesIn($this->disk, $directory);
+        $directories = Directory::directoriesIn($this->disk, $path);
         $directoriesList = [];
 
-        foreach( $directories as $dir ) {
+        foreach( $directories as $directory ) {
 
             $dirData = [];
-            $dirData['path'] = $dir;
-            $dirData['name'] = self::getNameFromPath($dir);
+            $dirData['path'] = $directory;
+            $dirData['name'] = self::getNameFromPath($directory);
 
             $directoriesList[] = $dirData;
         }
@@ -71,42 +71,47 @@ class LocalBrowser implements DiskBrowserContract
 
     /**
      * Create a new directory
-     * @param $directory
-     * @param $name
+     * @param string $path
+     * @param string $name
      * @return object
      */
-    public function createDirectoryIn($directory, $name)
+    public function createDirectory($name, $path = '/')
     {
-        $isDirectoryAdded = false;
+        $directoryDetails = null;
+        $isDirectoryAdded = Directory::createDirectory($name, $this->disk, $path );
 
-        if (Directory::doesDirectoryExistsIn($this->disk, $directory, $name) == false) {
-            $isDirectoryAdded = Directory::createDirectoryIn($this->disk, $directory, $name);
+        if ($isDirectoryAdded == true) {
+            $directoryDetails = [
+                'name' => $name,
+                'path' => $path . '/' . $name,
+            ];
         }
-
-        return $isDirectoryAdded;
+        return $directoryDetails;
     }
 
     /**
      * Create file in a directory
-     * @param $directory
      * @param UploadedFile $file
+     * @param string $path
      * @return mixed
      */
-    public function createFileIn($directory, UploadedFile $file)
+    public function createFile(UploadedFile $file, $path)
     {
-        $newFileName = uniqid() . '_' . 
-                       str_slug($file->getClientOriginalName(), '_') . '.' . 
-                       $file->getClientOriginalExtension();
+        $newFileName = str_slug(preg_replace('/\\.[^.\\s]{3,4}$/', '', $file->getClientOriginalName()), '_') .
+                        '_' .
+                        uniqid() .
+                        '.' .
+                        $file->getClientOriginalExtension();
 
-        $isFileUploaded = File::uploadFile($file, $newFileName, $this->disk, $directory);
+        $isFileUploaded = File::uploadFile($file, $newFileName, $this->disk, $path);
 
         $fileDetails = [];
 
         if ($isFileUploaded == true) {
-            $fileDetails = ['path' => $directory . DIRECTORY_SEPARATOR . $newFileName,
+            $fileDetails = ['path' => $path . DIRECTORY_SEPARATOR . $newFileName,
                 'name' => $newFileName,
-                'size' => File::getSizeOf($directory . DIRECTORY_SEPARATOR . $newFileName, $this->disk),
-                'last_modified_date' => File::getLastModifiedOf($directory . DIRECTORY_SEPARATOR . $newFileName, $this->disk),
+                'size' => File::getSizeOf($path . DIRECTORY_SEPARATOR . $newFileName, $this->disk),
+                'last_modified_date' => File::getLastModifiedOf($path . DIRECTORY_SEPARATOR . $newFileName, $this->disk),
             ];
         }
 

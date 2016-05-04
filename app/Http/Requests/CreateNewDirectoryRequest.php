@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Filesystem\Directory;
 use App\Http\Requests\Request;
 
 class CreateNewDirectoryRequest extends Request
@@ -23,10 +24,11 @@ class CreateNewDirectoryRequest extends Request
      */
     public function rules()
     {
+        $disks = config('filesystems.disks');
+
         return [
-            'disk'  => 'required',
-            'name'  => 'required',
-            'path'  => 'required',
+            'disk'  => 'required|in:' . implode(',',array_keys($disks)),
+            'name'  => 'required|directoryNotExists',
         ];
     }
 }

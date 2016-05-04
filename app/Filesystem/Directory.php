@@ -2,46 +2,48 @@
 
 namespace App\Filesystem;
 
-
-use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
-use App\Exceptions\Filesystem\MissingPathException;
 
 class Directory
 {
     /**
-     * Allow to create a new directory
-     * @param $disk
-     * @param $directory
-     * @param $dirName
-     * @return
+     * Create a new directory in a given path.
+     *
+     * @param string $name
+     * @param string $path
+     * @param string $disk
+     * @return boolean
      */
-    public static function createDirectoryIn($disk, $directory, $dirName)
+    public static function createDirectory($name, $disk = 'local', $path = '/')
     {
-        return Storage::disk($disk)->makeDirectory($directory . "/" . $dirName);
+        return Storage::disk($disk)->makeDirectory($path . DIRECTORY_SEPARATOR . $name);
     }
 
     /**
-     * Does directory already exists
-     * @param $disk
-     * @param $directory
-     * @param $dirName
-     * @return mixed
+     * Does the directory already exist?
+     * @param string $directoryName
+     * @param string $path
+     * @param string $disk
+     * @return boolean
      */
-    public static function doesDirectoryExistsIn($disk, $directory, $dirName)
+    public static function doesDirectoryExist($directoryName, $disk, $path = '/')
     {
-        return Storage::disk($disk)->has($directory . "/" . $dirName);
+        var_dump($disk);
+        var_dump($path);
+        var_dump(Storage::disk($disk)->has($path . DIRECTORY_SEPARATOR . $directoryName));
+        return Storage::disk($disk)->has($path . DIRECTORY_SEPARATOR . $directoryName);
     }
 
     /**
-     * Returns the sub directories in a particular directory
-     * @param $disk
-     * @param $directory
-     * @return mixed
+     * Returns all directories in a particular directory
+     * @param string $path
+     * @param string $disk
+     * @return Collection
      */
-    public static function subDirectoriesIn($disk, $directory)
+    public static function directoriesIn($disk, $path = '/')
     {
-        return collect(Storage::disk($disk)->directories($directory));
+        return collect(Storage::disk($disk)->directories($path));
     }
 
 
