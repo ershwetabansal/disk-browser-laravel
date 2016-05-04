@@ -246,35 +246,32 @@ class FileBrowserTest extends TestCase
 
     public function it_can_create_a_directory_within_a_given_directory_of_a_given_disk()
     {
-        //When I hit the create directory API, it should create a new directory
+        // Given there is a disk named 'integration_tests'.
 
-        //When I pass only the disk, it should create directory inside root directory
-        $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => 'elephants'])
+        // And it has the usual directory structure.
+
+        // When I make a POST request to /api/v1/directory/store with a directory name
+        $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => $this->testDirectory]);
+
+        // And make another request to add a directory inside the previously created directory
+        $this->post('/api/v1/directory/store', [
+            'disk' => 'integration_tests',
+            'name' => $this->testDirectory,
+            'path' => "/" . $this->testDirectory,
+            ])
+
+            //Then I see success as true and the name and path for new directory
             ->seeJson([
                 'success' => true,
                 'directory' => [
-                    'name' => 'elephants',
-                    'path' => '',
+                    'name' => $this->testDirectory,
+                    'path' => '/' . $this->testDirectory . '/' . $this->testDirectory,
                 ]
             ]);
 
-        $this->assertTrue($this->doesExist('/test'));
+        $this->assertTrue($this->doesExist('/' . $this->testDirectory));
 
-        //If I pass 'path' for first level directory, it should create directory inside first level directory
-        $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'path' => '/test', 'name' => '2016'])
-            ->seeJson([
-                'success' => true
-            ]);
-
-        $this->assertTrue($this->doesExist('/test/2016'));
-
-        //If I pass 'path' for second level directory, it should create directory inside second level directory
-        $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'path' => '/test/2016', 'name' => '01'])
-            ->seeJson([
-                'success' => true
-            ]);
-
-        $this->assertTrue($this->doesExist('/test/2016/01'));
+        $this->assertTrue($this->doesExist('/' . $this->testDirectory . '/' . $this->testDirectory));
 
     }
 
