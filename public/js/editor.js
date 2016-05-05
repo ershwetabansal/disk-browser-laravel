@@ -18,12 +18,12 @@ browser.setup({
 
     disks : {
         search : true,
+        search_URL: '/api/v1/disk/search',
         details : [
             {
                 //In case of cross origin disk
                 name: 'ea_images',
                 label: 'Images',
-                search_URL: '/asset/file/search',
                 path : {
                     relative : true
                 }
@@ -32,7 +32,6 @@ browser.setup({
                 //In case of cross origin disk
                 name: 'ea_publications',
                 label: 'Publications',
-                search_URL: '/asset/file/search',
                 path : {
                     relative : true
                 }

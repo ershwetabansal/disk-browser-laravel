@@ -92,7 +92,7 @@ class Directory
         $directories = Directory::allDirectoriesIn($disk);
         $searchedDirectories = [];
         foreach ($directories as $directory) {
-            if (strpos(self::getNameFromPath($directory), $searchedWord) !== false) {
+            if (strpos(strtolower(self::getNameFromPath($directory)), strtolower($searchedWord)) !== false) {
                 $searchedDirectories[] = Directory::getDirectoryMetaData($directory, $disk);
             }
         }

@@ -100,6 +100,10 @@ class FileTest extends TestCase
 
     }
 
+    public function it_returns_list_of_files_including_the_file_which_matches_searched_word_but_has_a_different_case()
+    {
+
+    }
     /**
      * Delete a given directory
      * @param string $directory

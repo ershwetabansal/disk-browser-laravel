@@ -89,31 +89,32 @@ function attachSearchFilesEvent() {
 	    	for (var i=0, len = disksParam.details.length; i < len; i++) {
 	    		var disk = disksParam.details[i];
 	    		var id = 'search_' + util.slugify(disk.label);
-	    		if (disk.search_URL) {
+	    		if (disksParam.search_URL) {
 		    		element.getFileSearchOptions().append($(searchLiElement(id, disk.label, 'fa-server')));
-		    		attachDiskSearchEvent(id, disk.search_URL);
+		    		attachDiskSearchEvent(id, disksParam.search_URL, disk.name);
 	    		}
 	    	}
-	    } else if (disksParam.search_URL) {
-	    	var disk_name = 'This disk';
-	    	var id = util.slugify(disk_name);
-		   	element.getFileSearchOptions().append($(searchLiElement(id, disk_name, 'fa-server')));
-		   	attachDiskSearchEvent(id, diskSearchURL);
 	    }
     }
 
-    function attachDiskSearchEvent(id, url) {
+    function attachDiskSearchEvent(id, url, diskName) {
     	element.getFileSearchOptions().find('#'+id).click(function() {
+            console.log(diskName);
     		var liElement = $(this);
-    		$.ajax({url : url, method : 'GET'})
-    		.success(function(data){
-    			reqHandler.getFileHandler().showFiles(data);
-    			element.select(element.getFileSearchOptions(), liElement);
-    		})
-    		.fail(function() {
-				reqHandler.getFileHandler().showFiles(mock.files);
-				element.select(element.getFileSearchOptions(), liElement);
-    		});
+            var params = {
+                'search': element.getSearchInput().val(),
+                'disk': diskName
+            };
+            reqHandler.makeAjaxRequest(url, success, fail, false, params);
+
+            function fail() {
+                alert('failed to search disk');
+            }
+
+            function success(data) {
+                reqHandler.getFileHandler().showFiles(data.files);
+                element.select(element.getFileSearchOptions(), liElement);
+            }
 		});
     }
 
@@ -163,7 +164,7 @@ function attachClickEventOnDirectories(dirElement, url) {
 function fetchSubdirectories(url, callback) {
 
 	var params =  {};
-	reqHandler.makeAjaxRequest(url, callback, fail, false, params)
+	reqHandler.makeAjaxRequest(url, callback, fail, false, params);
 	
 	function fail() {
 		alert('failed to get sub directories');

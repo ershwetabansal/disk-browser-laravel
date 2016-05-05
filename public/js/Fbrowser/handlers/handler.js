@@ -387,7 +387,7 @@ function getFileResponseParams() {
         name : 'Name',
         type : 'Type',
         size : 'size' + ((filesParam.size_unit) ? ('('+filesParam.size_unit+')') : ''),
-        last_modified_date : 'Last Modified Date'
+        modified_at : 'Last Modified Date'
     };
 }
 

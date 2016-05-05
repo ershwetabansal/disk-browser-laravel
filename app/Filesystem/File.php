@@ -113,8 +113,7 @@ class File
 
         $searchedFiles = [];
         foreach ($files as $file) {
-            if (strpos(self::getNameFromPath($file), $searchedWord) !== false) {
-
+            if (strpos(strtolower(self::getNameFromPath($file)), strtolower($searchedWord)) !== false) {
                 $fileMetaData = self::getFileMetaData($file, $disk);
 
                 if ($fileMetaData != []) {

@@ -28,7 +28,6 @@ class DiskController extends Controller
      */
     public function search(DiskSearchRequest $request)
     {
-        var_dump($request->input('disk'));
         $browser = new LocalBrowser($request->input('disk'));
 
         return $browser->searchDisk($request->input('search'));

@@ -110,6 +110,11 @@ class DirectoryTest extends TestCase
 
     }
 
+    public function it_returns_list_of_directories_including_the_directory_which_matches_searched_word_but_has_a_different_case()
+    {
+
+    }
+
 
     /**
      * Delete a given directory
