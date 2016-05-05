@@ -10,10 +10,10 @@ function browserSetup(setupObject) {
     }
 }
 
-function openBrowser(details) {
+function openBrowser(modalBoxParams) {
 	if (manager.validateSetupObject()) {
-		manager.load(details.button);
-		element.openModal(details.resize);
+		manager.load(modalBoxParams);
+		element.openModal(modalBoxParams.resize);
 	} else {
 		alert("Please check consoler errors.");
 	}

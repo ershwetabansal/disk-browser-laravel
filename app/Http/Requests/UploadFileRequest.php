@@ -31,7 +31,7 @@ class UploadFileRequest extends Request
 
         return [
             'disk'  => 'required|in:' . implode(',',array_keys($disks)),
-            'path'  => 'required|path_exists',
+            'path'  => 'path_exists',
             'file'  => 'required' . (($allowedExtensions != '' && $allowedExtensions != null) ? ('|mimes:' . $allowedExtensions) : ''),
         ];
     }

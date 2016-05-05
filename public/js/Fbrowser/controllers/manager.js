@@ -65,9 +65,9 @@ function manager(setupObject)
 		requestHandler.setupEvents();
 	}
 
-	function load(buttonDetails) {
-		requestHandler.load();
-        requestHandler.updateButtonDetails(buttonDetails);
+	function load(modalBoxParams) {
+		requestHandler.load(modalBoxParams);
+        requestHandler.updateButtonDetails(modalBoxParams.button);
 	}
 
 	return {

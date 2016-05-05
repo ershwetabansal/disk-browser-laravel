@@ -478,7 +478,7 @@ function getSearchInput() {
 function getFileSearchOptions() {
 
     if (!fileSearchOptions || fileSearchOptions.length == 0) {
-        fileSearchOptions = getFileWindow().find('#fb_file_search_options');
+        fileSearchOptions = getFileBrowser().find('#fb_file_search_options');
     }
 
     return fileSearchOptions;

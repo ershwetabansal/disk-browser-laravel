@@ -15,7 +15,7 @@ class Directory
      * @param string $disk
      * @return boolean
      */
-    public static function createDirectory($name, $disk = 'local', $path = '/')
+    public static function createDirectory($name, $disk = 'local', $path = DIRECTORY_SEPARATOR)
     {
         return Storage::disk($disk)->makeDirectory($path . DIRECTORY_SEPARATOR . $name);
     }
@@ -27,7 +27,7 @@ class Directory
      * @param string $disk
      * @return boolean
      */
-    public static function doesDirectoryExist($directoryName, $disk, $path = '/')
+    public static function doesDirectoryExist($directoryName, $disk, $path = DIRECTORY_SEPARATOR)
     {
         return Storage::disk($disk)->has($path . DIRECTORY_SEPARATOR . $directoryName);
     }
@@ -38,7 +38,7 @@ class Directory
      * @param string $disk
      * @return boolean
      */
-    public static function doesPathExist($disk, $path = '/')
+    public static function doesPathExist($disk, $path = DIRECTORY_SEPARATOR)
     {
         return Storage::disk($disk)->has($path);
     }
@@ -49,7 +49,7 @@ class Directory
      * @param string $disk
      * @return Collection
      */
-    public static function directoriesIn($disk, $path = '/')
+    public static function directoriesIn($disk, $path = DIRECTORY_SEPARATOR)
     {
         return collect(Storage::disk($disk)->directories($path));
     }
@@ -60,7 +60,7 @@ class Directory
      * @param string $path
      * @return mixed
      */
-    public static function allDirectoriesIn($disk, $path = '/')
+    public static function allDirectoriesIn($disk, $path = DIRECTORY_SEPARATOR)
     {
         return Storage::disk($disk)->allDirectories($path);
     }
@@ -77,7 +77,7 @@ class Directory
 
         $prefix = \App\DiskSpecifics::getPathPrefixFor($disk);
         $directoryData['name'] = self::getNameFromPath($directoryPath);
-        $directoryData['path'] = (strpos($directoryPath, '/') !== 0) ? $prefix . $directoryPath : $directoryPath;
+        $directoryData['path'] = (strpos($directoryPath, DIRECTORY_SEPARATOR) !== 0) ? $prefix . $directoryPath : $directoryPath;
         return $directoryData;
     }
 
@@ -107,7 +107,7 @@ class Directory
      */
     private static function getNameFromPath($path)
     {
-        $result = array_reverse(explode('/', $path));
+        $result = array_reverse(explode(DIRECTORY_SEPARATOR, $path));
         return $result[0];
     }
 

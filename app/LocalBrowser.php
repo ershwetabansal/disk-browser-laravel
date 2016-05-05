@@ -28,15 +28,17 @@ class LocalBrowser implements DiskBrowserContract
      * @return array
      *
      */
-    public function listFilesIn($directory = '/')
+    public function listFilesIn($directory = DIRECTORY_SEPARATOR)
     {
         $fileNames = File::filesIn($this->disk, $directory);
         $files = [];
 
         foreach( $fileNames as $file) {
-            $fileMetaData = File::getFileMetaData($file, $this->disk);
-            if ($fileMetaData != []) {
-                $files[] = $fileMetaData;
+            if (File::isFileAllowedOnDisk($file, $this->disk) == true) {
+                $fileMetaData = File::getFileMetaData($file, $this->disk);
+                if ($fileMetaData != []) {
+                    $files[] = $fileMetaData;
+                }
             }
         }
 
@@ -48,7 +50,7 @@ class LocalBrowser implements DiskBrowserContract
      * @param $path
      * @return array
      */
-    public function listDirectoriesIn($path = '/')
+    public function listDirectoriesIn($path = DIRECTORY_SEPARATOR)
     {
         $directories = Directory::directoriesIn($this->disk, $path);
         $directoriesList = [];
@@ -66,12 +68,12 @@ class LocalBrowser implements DiskBrowserContract
      * @param string $name
      * @return object
      */
-    public function createDirectory($name, $path = '/')
+    public function createDirectory($name, $path = DIRECTORY_SEPARATOR)
     {
         $isDirectoryAdded = Directory::createDirectory($name, $this->disk, $path );
 
         return ($isDirectoryAdded == true)
-                ? Directory::getDirectoryMetaData($path . '/' . $name, $this->disk)
+                ? Directory::getDirectoryMetaData($path . DIRECTORY_SEPARATOR . $name, $this->disk)
                 : null;
 
     }
@@ -82,7 +84,7 @@ class LocalBrowser implements DiskBrowserContract
      * @param string $path
      * @return mixed
      */
-    public function createFile(UploadedFile $file, $path = '/')
+    public function createFile(UploadedFile $file, $path = DIRECTORY_SEPARATOR)
     {
         $newFileName = File::generateUniqueFileName($file);
 

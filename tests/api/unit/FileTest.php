@@ -41,7 +41,7 @@ class FileTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-        $this->deleteDirectory($this->testDirectory);
+//        $this->deleteDirectory($this->testDirectory);
         
     }
 
@@ -104,15 +104,47 @@ class FileTest extends TestCase
     {
 
     }
-    /**
-     * Delete a given directory
-     * @param string $directory
-     */
-    private function deleteDirectory($directory)
+
+    /** @test */
+    public function it_returns_true_if_file_name_has_extension()
     {
-        if ($this->doesExist($directory)) {
-            Storage::disk('integration_tests')->deleteDirectory($directory);
-        }
+        $this->assertTrue(\App\Filesystem\File::doesTheFileHasExtension('i-love-this-dog.jpg'));
+    }
+
+    /** @test */
+    public function it_returns_false_if_file_name_does_not_have_extension()
+    {
+        $this->assertFalse(\App\Filesystem\File::doesTheFileHasExtension('i-love-this-dog'));
+
+        $this->assertFalse(\App\Filesystem\File::doesTheFileHasExtension('i-love-this-dog.'));
+    }
+
+    /** @test */
+    public function it_returns_true_if_file_extension_is_allowed_on_given_disk()
+    {
+        $this->assertTrue(\App\Filesystem\File::isFileAllowedOnDisk('/i-love-this-dog.jpg', 'integration_tests'));
+    }
+
+    /** @test */
+    public function it_returns_false_if_file_extension_is_not_allowed_on_given_disk()
+    {
+        $this->assertFalse(\App\Filesystem\File::isFileAllowedOnDisk('/i-love-this-dog.xlsx', 'integration_tests'));
+
+        $this->assertFalse(\App\Filesystem\File::isFileAllowedOnDisk('/i-love-this-dog.doc', 'integration_tests'));
+
+        $this->assertFalse(\App\Filesystem\File::isFileAllowedOnDisk('/.DS_Store', 'integration_tests'));
+    }
+
+    /** @test */
+    public function it_returns_true_if_file_is_a_hidden_file()
+    {
+        $this->assertTrue(\App\Filesystem\File::isGivenFileHidden('.DS_Store'));
+    }
+
+    /** @test */
+    public function it_returns_false_if_file_is_not_a_hidden_file()
+    {
+        $this->assertFalse(\App\Filesystem\File::isGivenFileHidden('i-love-this-dog.png'));
     }
 
     /**

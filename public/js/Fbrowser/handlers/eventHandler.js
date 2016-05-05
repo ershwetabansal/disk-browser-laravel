@@ -615,9 +615,10 @@ function positionMenu(target) {
 
  function resetView()
  {
- 	element.hide(element.getPrimarySubmitButton());
- 	reqHandler.getFileHandler().cleanUpView();
- 	closeFileSearch();
+     element.getErrorMessagePlaceHolder().empty();
+     element.hide(element.getPrimarySubmitButton());
+     reqHandler.getFileHandler().cleanUpView();
+     closeFileSearch();
  }
 
 module.exports = {

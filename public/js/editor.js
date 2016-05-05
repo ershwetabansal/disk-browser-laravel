@@ -3,7 +3,7 @@ tinymce.init({
     selector: 'textarea',
     paste_as_text: true,
     plugins: [
-        "advlist autolink link image imagetools lists anchor code fullscreen table template paste"
+        "advlist autolink link image lists anchor code fullscreen table template paste"
     ],
     //
     toolbar1: "bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent | undo redo",
@@ -77,9 +77,9 @@ browser.setup({
 function myFileBrowser(field_id, url, type, win)
 {
     browser.openBrowser({
+        path : url,
         button : {
             text : 'Update URL',
-            path : url,
             onClick : function(path) {
                 win.document.getElementById(field_id).value = path;
             }
@@ -90,6 +90,7 @@ function myFileBrowser(field_id, url, type, win)
 function accessBrowser()
 {
     browser.openBrowser({
+        context_menu: true,
         button : {
             text : 'Update URL',
             onClick : function(path) {

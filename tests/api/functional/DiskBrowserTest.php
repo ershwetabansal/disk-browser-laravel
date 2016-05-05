@@ -33,6 +33,7 @@ class DiskBrowserTest extends TestCase
         |  my-dog.jpg
         |  my-cat.jpg
         |  i-love-this-dog.jpg
+        |  spreadsheet.xlsx
         */
     }
 
@@ -166,17 +167,17 @@ class DiskBrowserTest extends TestCase
             ->seeJson([
                 'name' => 'i-love-this-dog.jpg',
                 'path' => '/i-love-this-dog.jpg',
-                'size' => 0,
+                'size' => 4.048,
             ])
             ->seeJsonContains([
                 'name' => 'my-dog.jpg',
                 'path' => '/my-dog.jpg',
-                'size' => 0,
+                'size' => 4.048,
             ])
             ->seeJsonContains([
                 'name' => 'my-cat.jpg',
                 'path' => '/my-cat.jpg',
-                'size' => 0,
+                'size' => 4.048,
             ]);
         
         $response = $this->response->content();
@@ -189,6 +190,25 @@ class DiskBrowserTest extends TestCase
 
     }
 
+
+    /** @test */
+    public function it_returns_files_with_only_allowed_file_types()
+    {
+        // Given there is a disk called 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // And only images are allowed on that disk while one spreadsheet is present on the root path of disk
+
+        // When I make a post request to /api/v1/files
+        $this->post('/api/v1/files', ['disk' => 'integration_tests'])
+
+        // I should not see spreadsheet in the result
+            ->dontSeeJson([
+                'name' => 'spreadsheet.xlsx'
+            ]);
+
+    }
     /** @test */
     public function it_returns_a_list_of_files_in_a_given_directory_of_a_given_disk()
     {
@@ -327,9 +347,12 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/files with an incorrect path
+        // And there is one test directory created in the root disk
+        $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => $this->testDirectory]);
+
+        // When I make a POST request to /api/v1/files without a directory name
         $this->post('/api/v1/directory/store',
-            ['disk' => 'integration_tests', 'name' => ''],
+            ['disk' => 'integration_tests', 'name' => '', 'path' => '/' . $this->testDirectory],
             [
                 'X-Content-Type-Options' => 'application/json',
                 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
@@ -339,6 +362,8 @@ class DiskBrowserTest extends TestCase
             ->seeJson([
                 "name" => [ "The name field is required." ]
             ])->assertResponseStatus(422);
+
+
     }
 
 
@@ -349,7 +374,7 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // And I make a POST request to /api/v1/directory/store with a directory name
+        // And there is one test directory created in the root disk
         $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => $this->testDirectory]);
 
         // When I make another request to add a directory inside the previously created directory
@@ -411,11 +436,11 @@ class DiskBrowserTest extends TestCase
         $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => $this->testDirectory]);
 
         // And there is a local file, ready for upload on the disk.
-        $localFile = env('BASE_PATH') . 'tests/stubs/files/test.jpg';
+        $localFile = env('BASE_PATH') . 'tests/stubs/files/elephant.jpg';
 
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(
             $localFile,
-            'test.jpg',
+            'elephant.jpg',
             'image/jpeg',
             null,
             null,
@@ -459,6 +484,9 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
+        //There is one test directory created in the root disk
+        $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => $this->testDirectory]);
+
         // And there is a local file, ready for upload on the disk.
         $localFile = env('BASE_PATH') . 'tests/stubs/files/spreadsheet.xlsx';
 
@@ -475,7 +503,7 @@ class DiskBrowserTest extends TestCase
         $response = $this->call(
             'POST',
             '/api/v1/file/store',
-            ['disk' => 'integration_tests'],
+            ['disk' => 'integration_tests', 'path' => '/' . $this->testDirectory],
             [],
             ['file' => $uploadedFile],
             [
@@ -486,7 +514,7 @@ class DiskBrowserTest extends TestCase
 
         //Response should have status 422 and error should say 'File type is not allowed
         $this->seeJsonContains([
-            'file' => ['The file must be a file of type: jpeg, png.']
+            'file' => ['The file must be a file of type: jpeg, png, jpg.']
         ]);
 
         $this->assertEquals('422', $response->getStatusCode());
@@ -519,34 +547,32 @@ class DiskBrowserTest extends TestCase
                     ],
                 ]
             )
-            ->seeJson(
+            ->seeJsonContains(
                 [
-                    'files' => [
-                        [
-                            'name' => 'cute_cat.png',
-                            'path' => '/cats/cute/cute_cat.png',
-                            'size' => 0,
-                            'modified_at' => '',
-                        ],
-                        [
-                            'name' => 'cute_puppies.jpg',
-                            'path' => '/dogs/puppies/cute_puppies.jpg',
-                            'size' => 0,
-                            'modified_at' => '',
-                        ],
-                        [
-                            'name' => 'cute_and_trained_puppies.jpg',
-                            'path' => '/dogs/puppies/trained/cute_and_trained_puppies.jpg',
-                            'size' => 0,
-                            'modified_at' => '',
-                        ],
-                        [
-                            'name' => 'cute_monkey.png',
-                            'path' => '/monkeys/cute/cute_monkey.png',
-                            'size' => 0,
-                            'modified_at' => '',
-                        ]
-                    ]
+                    'name' => 'cute_cat.png',
+                    'path' => '/cats/cute/cute_cat.png',
+                    'size' => 0,
+                ]
+            )
+            ->seeJsonContains(
+                [
+                    'name' => 'cute_puppies.jpg',
+                    'path' => '/dogs/puppies/cute_puppies.jpg',
+                    'size' => 0,
+                ]
+            )
+            ->seeJsonContains(
+                [
+                    'name' => 'cute_and_trained_puppies.jpg',
+                    'path' => '/dogs/puppies/trained/cute_and_trained_puppies.jpg',
+                    'size' => 0,
+                ]
+            )
+            ->seeJsonContains(
+                [
+                    'name' => 'cute_monkey.png',
+                    'path' => '/monkeys/cute/cute_monkey.png',
+                    'size' => 0,
                 ]
             );
 

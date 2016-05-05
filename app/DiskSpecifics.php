@@ -21,7 +21,7 @@ class DiskSpecifics
         ],
         'integration_tests' => [
             'path'       => '/',
-            'extensions' => 'jpeg,png',
+            'extensions' => 'jpeg,png,jpg',
         ],
     ];
 
@@ -35,7 +35,7 @@ class DiskSpecifics
     {
         $diskData = DiskSpecifics::$diskDetails[$disk];
 
-        $path = '/';
+        $path = DIRECTORY_SEPARATOR;
 
         if ($diskData && isset($diskData['path'])) {
             $path = $diskData['path'];

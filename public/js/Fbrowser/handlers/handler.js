@@ -3,7 +3,7 @@ var util = require('../helpers/util.js');
 var mock = require('../mock/mock.js');
 
 var diskHandler, dirHandler, fileHandler, eventHandler;
-var disksParam, directoriesParam, filesParam, httpParams, authParams;
+var disksParam, directoriesParam, filesParam, httpParams, authParams, modalBoxParams;
 
 /************************************************
 * Setup
@@ -87,7 +87,8 @@ function setupEvents() {
 * Load Disks, directories and files
 ************************************************/
 
-function load() {
+function load(modalBoxParameters) {
+    modalBoxParams = modalBoxParameters;
 	eventHandler.resetView();
 	loadDisks();
 	loadDirectories();
@@ -184,7 +185,11 @@ function attachFileEvents() {
 	eventHandler.attachKeysEventOnFiles();
 	eventHandler.attachClickEventOnFiles();
 	eventHandler.attachSortEventOnHeader();
-	eventHandler.attachFileContextMenuEvent();
+
+    if (modalBoxParams.context_menu == true) {
+        eventHandler.attachFileContextMenuEvent();
+    }
+
 	eventHandler.attachFileManageMenuEvent();
 
 	renameFileSetup();	
@@ -345,7 +350,6 @@ function updateError(response) {
     }
 
     element.getErrorMessagePlaceHolder().text(message);
-    console.log(JSON.stringify(response.responseJSON));
 }
 
 function addCommonParametersToFormData(formData) {
