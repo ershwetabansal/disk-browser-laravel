@@ -54,24 +54,55 @@ class Directory
         return collect(Storage::disk($disk)->directories($path));
     }
 
+    /**
+     * Returns all directories in a given disk
+     * @param string $disk
+     * @param string $path
+     * @return mixed
+     */
     public static function allDirectoriesIn($disk, $path = '/')
     {
         return Storage::disk($disk)->allDirectories($path);
     }
 
-    public static function getDirectoryMetaData($directory, $disk)
+    /**
+     * Get directory meta data
+     * @param string $directoryPath
+     * @param string $disk
+     * @return array
+     */
+    public static function getDirectoryMetaData($directoryPath, $disk)
     {
         $directoryData = [];
 
         $prefix = \App\DiskSpecifics::getPathPrefixFor($disk);
-        $directoryData['name'] = self::getNameFromPath($directory);
-        $directoryData['path'] = (strpos($directory, '/') !== 0) ? $prefix . $directory : $directory;
+        $directoryData['name'] = self::getNameFromPath($directoryPath);
+        $directoryData['path'] = (strpos($directoryPath, '/') !== 0) ? $prefix . $directoryPath : $directoryPath;
         return $directoryData;
     }
 
     /**
+     * Search matching directories in a given disk
+     * @param string $searchedWord
+     * @param string $disk
+     * @return array
+     */
+    public static function searchDisk($searchedWord, $disk)
+    {
+        $directories = Directory::allDirectoriesIn($disk);
+        $searchedDirectories = [];
+        foreach ($directories as $directory) {
+            if (strpos(self::getNameFromPath($directory), $searchedWord) !== false) {
+                $searchedDirectories[] = Directory::getDirectoryMetaData($directory, $disk);
+            }
+        }
+
+        return $searchedDirectories;
+    }
+
+    /**
      * Returns name from a given path string
-     * @param $path
+     * @param string $path
      * @return mixed
      */
     private static function getNameFromPath($path)
@@ -79,4 +110,5 @@ class Directory
         $result = array_reverse(explode('/', $path));
         return $result[0];
     }
+
 }

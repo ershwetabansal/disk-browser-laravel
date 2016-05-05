@@ -7,7 +7,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class DiskBrowserIntegrationTest extends TestCase
 {
 
-    use WithoutMiddleware, DatabaseTransactions;
+    use DatabaseTransactions;
 
     private $testDirectory = 'elephants';
 

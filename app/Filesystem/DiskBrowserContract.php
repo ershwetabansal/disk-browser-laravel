@@ -37,4 +37,10 @@ interface DiskBrowserContract
      */
     public function createFile(UploadedFile $file, $path);
 
+    /**
+     * Search a string in disk matching files' and directories' names
+     * @param string $searchedWord
+     * @return array
+     */
+    public function searchDisk($searchedWord);
 }

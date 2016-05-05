@@ -26,17 +26,20 @@ class LocalBrowser implements DiskBrowserContract
      *
      * @param string $directory
      * @return array
+     *
      */
     public function listFilesIn($directory = '/')
     {
         $fileNames = File::filesIn($this->disk, $directory);
         $files = [];
+
         foreach( $fileNames as $file) {
             $fileMetaData = File::getFileMetaData($file, $this->disk);
             if ($fileMetaData != []) {
                 $files[] = $fileMetaData;
             }
         }
+
         return $files;
     }
 
@@ -65,13 +68,12 @@ class LocalBrowser implements DiskBrowserContract
      */
     public function createDirectory($name, $path = '/')
     {
-        $directoryDetails = null;
         $isDirectoryAdded = Directory::createDirectory($name, $this->disk, $path );
 
-        if ($isDirectoryAdded == true) {
-            $directoryDetails = Directory::getDirectoryMetaData($path . '/' . $name, $this->disk);
-        }
-        return $directoryDetails;
+        return ($isDirectoryAdded == true)
+                ? Directory::getDirectoryMetaData($path . '/' . $name, $this->disk)
+                : null;
+
     }
 
     /**
@@ -80,64 +82,28 @@ class LocalBrowser implements DiskBrowserContract
      * @param string $path
      * @return mixed
      */
-    public function createFile(UploadedFile $file, $path)
+    public function createFile(UploadedFile $file, $path = '/')
     {
-        $newFileName = str_slug(preg_replace('/\\.[^.\\s]{3,4}$/', '', $file->getClientOriginalName()), '_') .
-                        '_' .
-                        uniqid() .
-                        '.' .
-                        $file->getClientOriginalExtension();
+        $newFileName = File::generateUniqueFileName($file);
 
         $isFileUploaded = File::uploadFile($file, $newFileName, $this->disk, $path);
 
-        $fileDetails = [];
-
-        if ($isFileUploaded == true) {
-            $fileDetails = File::getFileMetaData($path . DIRECTORY_SEPARATOR . $newFileName, $this->disk);
-        }
-
-        return $fileDetails;
-
-    }
-
-    public function searchDisk($searchedWord)
-    {
-        $files = File::allFilesIn($this->disk);
-        $directories = Directory::allDirectoriesIn($this->disk);
-        
-        $searchedFiles = [];
-        foreach ($files as $file) {
-            if (strpos(self::getNameFromPath($file), $searchedWord) !== false) {
-                var_dump($file);
-                $fileMetaData = File::getFileMetaData($file, $this->disk);
-                var_dump($fileMetaData);
-                if ($fileMetaData != []) {
-                    $searchedFiles[] = $fileMetaData;
-                }
-            }
-        }
-        
-        $searchedDirectories = [];
-        foreach ($directories as $directory) {
-            if (strpos(self::getNameFromPath($directory), $searchedWord) !== false) {
-                $searchedDirectories[] = Directory::getDirectoryMetaData($directory, $this->disk);
-            }
-        }
-        return [
-            'files' => $searchedFiles,
-            'directories' => $searchedDirectories,
-        ];
+        return ($isFileUploaded == true)
+               ? File::getFileMetaData($path . DIRECTORY_SEPARATOR . $newFileName, $this->disk)
+               : [];
     }
 
     /**
-     * Returns name from a given path string
-     * @param $path
-     * @return mixed
+     * Search a string in disk matching files' and directories' names
+     * @param string $searchedWord
+     * @return array
      */
-    private static function getNameFromPath($path)
+    public function searchDisk($searchedWord)
     {
-        $result = array_reverse(explode('/', $path));
-        return $result[0];
+        return [
+            'files' => File::searchDisk($searchedWord, $this->disk),
+            'directories' => Directory::searchDisk($searchedWord, $this->disk),
+        ];
     }
 
 }
