@@ -31,8 +31,15 @@ class UploadFileRequest extends Request
 
         return [
             'disk'  => 'required|in:' . implode(',',array_keys($disks)),
-            'path'  => 'required',
+            'path'  => 'required|path_exists',
             'file'  => 'required' . (($allowedExtensions != '' && $allowedExtensions != null) ? ('|mimes:' . $allowedExtensions) : ''),
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'path.path_exists' => 'Path does not exist in given disk.',
         ];
     }
 }

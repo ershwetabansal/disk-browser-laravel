@@ -29,13 +29,15 @@ class CreateNewDirectoryRequest extends Request
         return [
             'disk'  => 'required|in:' . implode(',',array_keys($disks)),
             'name'  => 'required|directory_not_exists',
+            'path'  => 'path_exists',
         ];
     }
 
     public function messages()
     {
         return [
-            'name.directory_not_exists' => 'Directory already exists'
+            'name.directory_not_exists' => 'Directory already exists.',
+            'path.path_exists' => 'Path does not exist in given disk.',
         ];
     }
 }

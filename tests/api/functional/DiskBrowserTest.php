@@ -130,6 +130,29 @@ class DiskBrowserTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_error_when_directories_are_requested_from_non_existing_path()
+    {
+
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // When I make a POST request to /api/v1/files with an incorrect path
+        $this->post('/api/v1/directories',
+            ['disk' => 'integration_tests', 'path' => '/' . $this->testDirectory],
+            [
+                'X-Content-Type-Options' => 'application/json',
+                'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
+            ]
+        )
+            //Then I see the following error
+            ->seeJson([
+                "path" => [ "Path does not exist in given disk." ]
+            ])->assertResponseStatus(422);;
+
+    }
+
+    /** @test */
     public function it_returns_a_list_of_files_in_the_root_directory_of_a_given_disk()
     {
         // Given there is a disk named 'integration_tests'.
@@ -228,6 +251,29 @@ class DiskBrowserTest extends TestCase
     }
 
     /** @test */
+    public function it_returns_error_when_files_are_requested_from_non_existing_path()
+    {
+
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // When I make a POST request to /api/v1/files with an incorrect path
+        $this->post('/api/v1/files',
+                ['disk' => 'integration_tests', 'path' => '/' . $this->testDirectory],
+                [
+                    'X-Content-Type-Options' => 'application/json',
+                    'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
+                ]
+            )
+            //Then I see the following error
+            ->seeJson([
+                "path" => [ "Path does not exist in given disk." ]
+            ])->assertResponseStatus(422);;
+
+    }
+
+    /** @test */
     public function it_can_create_a_directory_within_the_root_directory_of_a_given_disk()
     {
 
@@ -249,6 +295,50 @@ class DiskBrowserTest extends TestCase
 
         $this->assertTrue($this->doesExist('/' . $this->testDirectory));
 
+    }
+
+    /** @test */
+    public function it_returns_error_when_directory_is_tried_to_be_created_in_non_existing_path()
+    {
+
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // When I make a POST request to /api/v1/files with an incorrect path
+        $this->post('/api/v1/directory/store',
+            ['disk' => 'integration_tests', 'path' => '/' . $this->testDirectory, 'name' => $this->testDirectory],
+            [
+                'X-Content-Type-Options' => 'application/json',
+                'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
+            ]
+        )
+            //Then I see the following error
+            ->seeJson([
+                "path" => [ "Path does not exist in given disk." ]
+            ])->assertResponseStatus(422);
+    }
+
+    /** @test */
+    public function it_returns_error_when_directory_name_is_not_given_while_creating_a_directory()
+    {
+
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // When I make a POST request to /api/v1/files with an incorrect path
+        $this->post('/api/v1/directory/store',
+            ['disk' => 'integration_tests', 'name' => ''],
+            [
+                'X-Content-Type-Options' => 'application/json',
+                'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest',
+            ]
+        )
+            //Then I see the following error
+            ->seeJson([
+                "name" => [ "The name field is required." ]
+            ])->assertResponseStatus(422);
     }
 
 
@@ -304,7 +394,7 @@ class DiskBrowserTest extends TestCase
             )
             //Then I see an error '422' and the error message
             ->seeJson([
-                "name" => [ "Directory already exists" ]
+                "name" => [ "Directory already exists." ]
             ])->assertResponseStatus(422);
 
     }
@@ -316,6 +406,9 @@ class DiskBrowserTest extends TestCase
         // Given there is a disk named 'integration_tests'.
 
         // And it has the usual directory structure.
+
+        // And we add a test directory in the root of the disk
+        $this->post('/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => $this->testDirectory]);
 
         // And there is a local file, ready for upload on the disk.
         $localFile = env('BASE_PATH') . 'tests/stubs/files/test.jpg';
@@ -329,7 +422,7 @@ class DiskBrowserTest extends TestCase
             true
         );
 
-        // When I make a POST request to upload the file
+        // When I make a POST request to upload the file to the newly created test directory
         $response = $this->call('POST', '/api/v1/file/store', [
                 'disk' => 'integration_tests',
                 'path' => '/' . $this->testDirectory
@@ -432,18 +525,26 @@ class DiskBrowserTest extends TestCase
                         [
                             'name' => 'cute_cat.png',
                             'path' => '/cats/cute/cute_cat.png',
+                            'size' => 0,
+                            'modified_at' => '',
                         ],
                         [
                             'name' => 'cute_puppies.jpg',
                             'path' => '/dogs/puppies/cute_puppies.jpg',
+                            'size' => 0,
+                            'modified_at' => '',
                         ],
                         [
                             'name' => 'cute_and_trained_puppies.jpg',
                             'path' => '/dogs/puppies/trained/cute_and_trained_puppies.jpg',
+                            'size' => 0,
+                            'modified_at' => '',
                         ],
                         [
                             'name' => 'cute_monkey.png',
                             'path' => '/monkeys/cute/cute_monkey.png',
+                            'size' => 0,
+                            'modified_at' => '',
                         ]
                     ]
                 ]

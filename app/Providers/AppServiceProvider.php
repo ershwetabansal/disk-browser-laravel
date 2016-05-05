@@ -20,6 +20,16 @@ class AppServiceProvider extends ServiceProvider
             return (Directory::doesDirectoryExist($value, $validator->getData()['disk'], $path) == false);
 
         });
+
+        \Validator::extend('path_exists', function($attribute, $value, $parameters, $validator) {
+
+            if (isset($value)) {
+                return (Directory::doesPathExist($validator->getData()['disk'], $value));
+            }
+
+            return true;
+
+        });
     }
 
     /**

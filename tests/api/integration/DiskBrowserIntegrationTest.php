@@ -43,57 +43,117 @@ class DiskBrowserIntegrationTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-
+        $this->deleteDirectory($this->testDirectory);
         
     }
 
     /** @test */
-    public function it_returns_files_in_a_root_directory()
+    public function it_returns_list_of_files_in_a_root_directory()
     {
+        //When we setup the directory structure
 
-        
+        //And setup disk browser for 'integration_tests' disk
+
+        //And get the list of files in root path
+        $result = $this->browser->listFilesIn();
+
+        //Then we see three files in the root path
+        $this->assertEquals(sizeof($result), 3);
+        //Names of the files
+        $this->assertContains('i-love-this-dog.jpg', $result);
+        $this->assertContains('my-cat.jpg', $result);
+        $this->assertContains('my-dog.jpg', $result);
+
+        $this->assertContains([
+            'name' => 'i-love-this-dog.jpg',
+            'path' => '/i-love-this-dog.jpg'
+        ], $result);
+
+        $this->assertContains([
+            'name' => 'my-cat.jpg',
+            'path' => '/my-cat.jpg'
+        ], $result);
+
+        $this->assertContains([
+            'name' => 'my-dog.jpg',
+            'path' => '/my-dog.jpg'
+        ], $result);
+
     }
 
     /** @test */
-    public function it_returns_files_in_a_given_directory()
+    public function it_returns_list_of_files_in_a_given_directory()
     {
-
+        $this->assertEquals($this->browser->listFilesIn('/dogs/puppies'), []);
     }
 
     /** @test */
-    public function it_returns_directories_in_root_directory()
+    public function it_returns_list_of_files_in_a_given_directory_inside_another_directory()
     {
-
+        $this->assertEquals($this->browser->listFilesIn('/dogs/puppies/trained'), []);
     }
 
     /** @test */
-    public function it_returns_directories_in_a_given_directory()
+    public function it_returns_empty_array_when_requested_from_non_existing_path()
     {
+        $this->assertEquals($this->browser->listFilesIn('/elephants'), []);
+    }
 
+    /** @test */
+    public function it_returns_list_of_directories_in_root_directory()
+    {
+        $this->assertEquals($this->browser->listDirectoriesIn(), []);
+    }
+
+    /** @test */
+    public function it_returns_list_of_directories_in_a_given_directory()
+    {
+        $this->assertEquals($this->browser->listDirectoriesIn('/dogs'), []);
+    }
+
+    /** @test */
+    public function it_returns_list_of_directories_in_a_given_directory_inside_another_directory()
+    {
+        $this->assertEquals($this->browser->listDirectoriesIn('/dogs/puppies'), []);
     }
 
     /** @test */
     public function it_creates_directory_in_root_directory()
     {
-
+        $this->assertEquals($this->browser->createDirectory($this->testDirectory), []);
     }
 
     /** @test */
     public function it_creates_directory_in_a_given_directory()
     {
+        $this->assertEquals($this->browser->createDirectory($this->testDirectory), []);
 
+        $this->assertEquals($this->browser->createDirectory($this->testDirectory, '/' . $this->testDirectory), []);
     }
 
     /** @test */
     public function it_does_not_create_a_directory_if_directory_already_exists_with_same_name()
     {
+        $this->assertEquals($this->browser->createDirectory($this->testDirectory), []);
 
+        $this->assertEquals($this->browser->createDirectory($this->testDirectory), []);
     }
 
     /** @test */
     public function it_stores_file_in_a_given_directory()
     {
+        $localFile = env('BASE_PATH') . 'tests/stubs/files/spreadsheet.xlsx';
 
+        $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(
+            $localFile,
+            'spreadsheet.xlsx',
+            'application/vnd.ms-excel',
+            null,
+            null,
+            true
+        );
+
+        $this->assertEquals($this->browser->createFile($uploadedFile, $this->testDirectory), []);
     }
 
     /** @test */
@@ -140,5 +200,28 @@ class DiskBrowserIntegrationTest extends TestCase
 
 
     }
+
+
+    /**
+     * Delete a given directory
+     * @param string $directory
+     */
+    private function deleteDirectory($directory)
+    {
+        if ($this->doesExist($directory)) {
+            Storage::disk('integration_tests')->deleteDirectory($directory);
+        }
+    }
+
+    /**
+     * Returns true if path exists in the given directory
+     * @param string $path
+     * @return boolean
+     */
+    private function doesExist($path)
+    {
+        return Storage::disk('integration_tests')->has($path);
+    }
+
 
 }

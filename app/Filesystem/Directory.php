@@ -33,6 +33,17 @@ class Directory
     }
 
     /**
+     * Does the path exist in a given disk
+     * @param string $path
+     * @param string $disk
+     * @return boolean
+     */
+    public static function doesPathExist($disk, $path = '/')
+    {
+        return Storage::disk($disk)->has($path);
+    }
+
+    /**
      * Returns all directories in a particular directory
      * @param string $path
      * @param string $disk

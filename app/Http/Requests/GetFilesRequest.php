@@ -27,6 +27,14 @@ class GetFilesRequest extends Request
 
         return [
             'disk'  => 'required|in:' . implode(',',array_keys($disks)),
+            'path'  => 'path_exists',
+        ];
+    }
+
+    public function messages()
+    {
+        return [
+            'path.path_exists' => 'Path does not exist in given disk.',
         ];
     }
 }
