@@ -8,10 +8,10 @@ function file() {
     var current_files_array = [];
 
     var currentView = 'grid';
-    
-/****************************************************
-** Load files
-*****************************************************/
+
+//----------------------------------------------
+//  Load files
+//----------------------------------------------
 
 	function loadFiles(data) {
         currentView = currentView || 'grid';
@@ -52,19 +52,23 @@ function file() {
         }
        
         function loadFileList(filesArray) {
+            var rootPath = reqHandler.getRootPathForCurrentDir();
             appendFileHeader();
             var tableBody = element.getFilesList().find('tbody');
             for (var i=0, len = filesArray.length; i < len; i++) {
                 var file = filesArray[i];
                 file.id = util.slugify(file.name);
                 file.type = file.type || util.getFileType(file.name);
+                var path = file.path || reqHandler.getAbsolutePath(file, rootPath);
 
                 var listElements = '<tr id="'+file.id+'" tabindex="1">';
 
                 for (var key in reqHandler.getFileResponseParams()) {
                     listElements += '<td>';
                     if (key == 'name') {
-                        listElements += '<i class="small-icon fa ' + util.getFontAwesomeClass(file.type) + '"></i>';
+                        listElements += (util.isImage(file.type)) ? '<img src="' + path + '" alt="' + file.name + '"/>'
+                            :
+                            '<i class="small-icon fa ' + util.getFontAwesomeClass(file.type) + '"></i>';
                     }
                     listElements += file[key];
                     listElements += '</td>';
@@ -112,9 +116,9 @@ function file() {
 
     }
 
-/****************************************************
-** Show files as list and grid
-*****************************************************/
+//----------------------------------------------
+//  Show files as list and grid
+//----------------------------------------------
 
     function showFileList() {
         currentView = 'list';
@@ -128,9 +132,9 @@ function file() {
         element.hide(element.getFilesList());
     }
 
-/****************************************************
-** Sort files by selected type
-*****************************************************/
+//----------------------------------------------
+//  Sort files by selected type
+//----------------------------------------------
 
     function sortFilesBy(type, isAsc) {
         isAsc = (typeof(isAsc) == "undefined") ? true : isAsc;
@@ -160,9 +164,9 @@ function file() {
     }
 
 
-/****************************************************
-** Search files
-*****************************************************/
+//----------------------------------------------
+//  Search files
+//----------------------------------------------
 
     function searchFiles(text) {
         var searchedFiles = [];
@@ -175,9 +179,9 @@ function file() {
         showFiles(searchedFiles);
     }
 
-/****************************************************
-** Show and hide file details
-*****************************************************/
+//----------------------------------------------
+//  Show and hide file details
+//----------------------------------------------
 
     function showFileDetails(file) {
         var fileDetails = element.getFileDetailsDiv();
@@ -202,9 +206,9 @@ function file() {
         element.hide(fileDetails);
     }
 
-/****************************************************
-** Get current file element and details
-*****************************************************/
+//----------------------------------------------
+//  Get current file element and details
+//----------------------------------------------
     function getCurrentFileDetails() {
 
         var fileList = (currentView =='list') ? element.getFilesList() : element.getFilesGrid();
@@ -252,9 +256,7 @@ function file() {
         directory_files_array.push(file);
         showFiles();
     }
-/****************************************************
-** 
-*****************************************************/
+
 
     return {
     	loadFiles : loadFiles,
