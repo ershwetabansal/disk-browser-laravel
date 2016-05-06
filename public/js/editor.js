@@ -9,7 +9,10 @@ tinymce.init({
     toolbar1: "bold italic underline | alignleft aligncenter alignright alignjustify | bullist numlist | outdent indent | undo redo",
     toolbar2: "table link unlink | image | formatselect | code",
     menubar: false,
-    file_browser_callback : myFileBrowser
+    file_browser_callback : myFileBrowser,
+    table_default_styles: {
+        width: '100%'
+    }
 });
 
 

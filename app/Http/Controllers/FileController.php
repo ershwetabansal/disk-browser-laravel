@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\Filesystem\PathNotFoundInDiskException;
+use App\Filesystem\Directory;
 use App\LocalBrowser;
 use Illuminate\Http\Request;
 
@@ -33,7 +35,6 @@ class FileController extends Controller
     public function store(UploadFileRequest $request)
     {
         $browser = new LocalBrowser($request->input('disk'));
-
         return $browser->createFile($request->file('file'), $request->input('path'));
 
     }
@@ -81,5 +82,14 @@ class FileController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    private function pathNotFoundResponse()
+    {
+        return response([
+            'errors' => [
+                'The path does not exist on the given disk.'
+            ]
+        ], 422);
     }
 }

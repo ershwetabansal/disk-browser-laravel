@@ -2,6 +2,8 @@
 
 namespace App\Exceptions;
 
+use App\Exceptions\Filesystem\DirectoryAlreadyExistsException;
+use App\Exceptions\Filesystem\PathNotFoundInDiskException;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -42,8 +44,12 @@ class Handler extends ExceptionHandler
      */
     public function render($request, Exception $e)
     {
-        if ($e instanceof ModelNotFoundException) {
-            $e = new NotFoundHttpException($e->getMessage(), $e);
+        if ($e instanceof PathNotFoundInDiskException) {
+            return response(['errors' => ['Path does not exist.']],422);
+        }
+
+        if ($e instanceof DirectoryAlreadyExistsException) {
+            return response(['errors' => ['Directory already exists in the given path.']],422);
         }
 
         return parent::render($request, $e);

@@ -2,9 +2,7 @@
 
 namespace App\Filesystem;
 
-use App\DiskSpecifics;
-use App\User;
-use Illuminate\Database\Eloquent\Model;
+use App\Disks\Disk;
 use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -15,12 +13,12 @@ class File
      * @param UploadedFile $file
      * @param string $fileName
      * @param string $disk
-     * @param string $directory
+     * @param string $path
      * @return boolean
      */
-    public static function uploadFile(UploadedFile $file, $fileName, $disk, $directory = DIRECTORY_SEPARATOR)
+    public static function uploadFile(UploadedFile $file, $fileName, $disk, $path = DIRECTORY_SEPARATOR)
     {
-       return Storage::disk($disk)->put($directory . DIRECTORY_SEPARATOR . $fileName, file_get_contents($file->getRealPath()));
+       return Storage::disk($disk)->put(Path::valid($path) . $fileName, file_get_contents($file->getRealPath()));
     }
 
     /**
@@ -31,6 +29,7 @@ class File
      */
     public static function filesIn($disk, $path = DIRECTORY_SEPARATOR)
     {
+
         return collect(Storage::disk($disk)->files($path));
     }
 
@@ -77,9 +76,9 @@ class File
     {
         $fileData = [];
 
-        $fileName = self::getNameFromPath($file);
+        $fileName = Path::stripName($file);
         $fileData['name'] = $fileName;
-        $fileData['path'] = \App\DiskSpecifics::getPathPrefixFor($disk) . $file;
+        $fileData['path'] = Path::valid(Disk::pathPrefixFor($disk)) . $file;
         $fileData['size'] = self::getSizeOf($file, $disk);
         $fileData['modified_at'] = self::getLastModifiedOf($file, $disk);
 
@@ -112,7 +111,7 @@ class File
 
         $searchedFiles = [];
         foreach ($files as $file) {
-            if (strpos(strtolower(self::getNameFromPath($file)), strtolower($searchedWord)) !== false) {
+            if (strpos(strtolower(Path::stripName($file)), strtolower($searchedWord)) !== false) {
                 $fileMetaData = self::getFileMetaData($file, $disk);
 
                 if ($fileMetaData != []) {
@@ -132,12 +131,12 @@ class File
      */
     public static function isFileAllowedOnDisk($file, $disk)
     {
-        $fileName = self::getNameFromPath($file);
+        $fileName = Path::stripName($file);
 
         if (self::isGivenFileHidden($fileName) == false && self::doesTheFileHasExtension($fileName) == true) {
-            $mimeTypes = DiskSpecifics::getAllowedFileMimeTypesFor($disk);
+            $mimeTypes = Disk::extensionsFor($disk);
 
-            if (str_contains($mimeTypes, array_reverse(explode('.', $fileName))[0]) == true) {
+            if (in_array(array_reverse(explode('.', $fileName))[0], $mimeTypes) == true) {
                 return true;
             }
         }
@@ -165,14 +164,5 @@ class File
     {
         return substr($file,0,1) == '.';
     }
-    /**
-     * Returns name from a given path string
-     * @param $path
-     * @return mixed
-     */
-    private static function getNameFromPath($path)
-    {
-        $result = array_reverse(explode(DIRECTORY_SEPARATOR, $path));
-        return $result[0];
-    }
+
 }

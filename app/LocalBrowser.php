@@ -2,11 +2,12 @@
 
 namespace App;
 
+use App\Filesystem\File;
 use App\Filesystem\Directory;
 use App\Filesystem\DiskBrowserContract;
-use App\Filesystem\File;
-use Illuminate\Support\Facades\Storage;
+use App\Filesystem\Path;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use App\Exceptions\Filesystem\DirectoryAlreadyExistsException;
 
 class LocalBrowser implements DiskBrowserContract
 {
@@ -16,6 +17,9 @@ class LocalBrowser implements DiskBrowserContract
      */
     private $disk = 'local';
 
+    /**
+     * @param string $diskName
+     */
     public function __construct($diskName)
     {
         $this->disk = $diskName;
@@ -24,20 +28,23 @@ class LocalBrowser implements DiskBrowserContract
     /**
      * List all files in a given directory.
      *
-     * @param string $directory
+     * @param string $path
      * @return array
      *
      */
-    public function listFilesIn($directory = DIRECTORY_SEPARATOR)
+    public function listFilesIn($path = DIRECTORY_SEPARATOR)
     {
-        $fileNames = File::filesIn($this->disk, $directory);
         $files = [];
 
-        foreach( $fileNames as $file) {
-            if (File::isFileAllowedOnDisk($file, $this->disk) == true) {
-                $fileMetaData = File::getFileMetaData($file, $this->disk);
-                if ($fileMetaData != []) {
-                    $files[] = $fileMetaData;
+        if (Directory::exists($this->disk, $path)) {
+            $fileNames = File::filesIn($this->disk, $path);
+
+            foreach( $fileNames as $file) {
+                if (File::isFileAllowedOnDisk($file, $this->disk) == true) {
+                    $fileMetaData = File::getFileMetaData($file, $this->disk);
+                    if ($fileMetaData != []) {
+                        $files[] = $fileMetaData;
+                    }
                 }
             }
         }
@@ -52,47 +59,55 @@ class LocalBrowser implements DiskBrowserContract
      */
     public function listDirectoriesIn($path = DIRECTORY_SEPARATOR)
     {
-        $directories = Directory::directoriesIn($this->disk, $path);
         $directoriesList = [];
+        if (Directory::exists($this->disk, $path)) {
+            $directories = Directory::directoriesIn($this->disk, $path);
 
-        foreach( $directories as $directory ) {
-            $directoriesList[] = Directory::getDirectoryMetaData($directory, $this->disk);
+            foreach( $directories as $directory ) {
+                $directoriesList[] = Directory::getDirectoryMetaData($directory, $this->disk);
+            }
         }
 
         return $directoriesList;
     }
 
     /**
-     * Create a new directory
-     * @param string $path
      * @param string $name
-     * @return object
+     * @param string $path
+     * @return array
+     * @throws DirectoryAlreadyExistsException
+     * @throws Exceptions\Filesystem\PathNotFoundInDiskException
      */
     public function createDirectory($name, $path = DIRECTORY_SEPARATOR)
     {
-        $isDirectoryAdded = Directory::createDirectory($name, $this->disk, $path );
+        $path = $path ?: DIRECTORY_SEPARATOR;
 
-        return ($isDirectoryAdded == true)
-                ? Directory::getDirectoryMetaData($path . DIRECTORY_SEPARATOR . $name, $this->disk)
-                : null;
+        if (Directory::exists($this->disk, $path) && Directory::notExists($name, $this->disk, $path)) {
 
+            Directory::createDirectory($name, $this->disk, $path );
+
+            return Directory::getDirectoryMetaData(Path::valid($path) . $name, $this->disk);
+        } else {
+            throw new DirectoryAlreadyExistsException();
+        }
     }
 
     /**
      * Create file in a directory
      * @param UploadedFile $file
      * @param string $path
-     * @return mixed
+     * @return array
      */
     public function createFile(UploadedFile $file, $path = DIRECTORY_SEPARATOR)
     {
         $newFileName = File::generateUniqueFileName($file);
 
-        $isFileUploaded = File::uploadFile($file, $newFileName, $this->disk, $path);
-
-        return ($isFileUploaded == true)
-               ? File::getFileMetaData($path . DIRECTORY_SEPARATOR . $newFileName, $this->disk)
-               : [];
+        if (Directory::exists($this->disk, $path)) {
+            File::uploadFile($file, $newFileName, $this->disk, $path);
+            return File::getFileMetaData(Path::valid($path) . $newFileName, $this->disk);
+        } else {
+            return [];
+        }
     }
 
     /**

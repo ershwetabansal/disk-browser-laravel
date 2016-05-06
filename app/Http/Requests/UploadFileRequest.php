@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\DiskSpecifics;
+use App\Disks\Disk;
 use App\Http\Requests\Request;
 
 class UploadFileRequest extends Request
@@ -25,21 +25,12 @@ class UploadFileRequest extends Request
     public function rules()
     {
         $disks = config('filesystems.disks');
-        $diskName = $this->input('disk');
 
-        $allowedExtensions = DiskSpecifics::getAllowedFileMimeTypesFor($diskName);
+        $extensions = ($this->input('disk')) ? Disk::extensionsFor($this->input('disk')) : [];
 
         return [
             'disk'  => 'required|in:' . implode(',',array_keys($disks)),
-            'path'  => 'path_exists',
-            'file'  => 'required' . (($allowedExtensions != '' && $allowedExtensions != null) ? ('|mimes:' . $allowedExtensions) : ''),
-        ];
-    }
-
-    public function messages()
-    {
-        return [
-            'path.path_exists' => 'Path does not exist in given disk.',
+            'file'  => 'required' . (($extensions != []) ? ('|mimes:' . implode(',', $extensions)) : ''),
         ];
     }
 }

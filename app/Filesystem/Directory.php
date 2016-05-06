@@ -2,6 +2,9 @@
 
 namespace App\Filesystem;
 
+use App\Disks\Disk;
+use App\Exceptions\Filesystem\DirectoryAlreadyExistsException;
+use App\Exceptions\Filesystem\PathNotFoundInDiskException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 
@@ -17,30 +20,39 @@ class Directory
      */
     public static function createDirectory($name, $disk = 'local', $path = DIRECTORY_SEPARATOR)
     {
-        return Storage::disk($disk)->makeDirectory($path . DIRECTORY_SEPARATOR . $name);
+        return Storage::disk($disk)->makeDirectory(Path::valid($path) . $name);
     }
 
     /**
-     * Does the directory already exist?
-     * @param string $directoryName
-     * @param string $path
+     * Returns exception if path does not exist in given disk otherwise returns true
      * @param string $disk
+     * @param string $path
      * @return boolean
+     * @throws PathNotFoundInDiskException
      */
-    public static function doesDirectoryExist($directoryName, $disk, $path = DIRECTORY_SEPARATOR)
+    public static function exists($disk, $path = DIRECTORY_SEPARATOR)
     {
-        return Storage::disk($disk)->has($path . DIRECTORY_SEPARATOR . $directoryName);
+        if (!Storage::disk($disk)->has($path)) {
+            throw new PathNotFoundInDiskException();
+        }
+        return true;
     }
 
+
     /**
-     * Does the path exist in a given disk
+     * Returns exception if directory already exists in given disk otherwise returns true
+     * @param $name
+     * @param $disk
      * @param string $path
-     * @param string $disk
-     * @return boolean
+     * @return bool
+     * @throws DirectoryAlreadyExistsException
      */
-    public static function doesPathExist($disk, $path = DIRECTORY_SEPARATOR)
+    public static function notExists($name, $disk, $path = DIRECTORY_SEPARATOR)
     {
-        return Storage::disk($disk)->has($path);
+        if (Storage::disk($disk)->has(Path::valid($path) . $name)) {
+            throw new DirectoryAlreadyExistsException();
+        }
+        return true;
     }
 
     /**
@@ -75,9 +87,8 @@ class Directory
     {
         $directoryData = [];
 
-        $prefix = \App\DiskSpecifics::getPathPrefixFor($disk);
-        $directoryData['name'] = self::getNameFromPath($directoryPath);
-        $directoryData['path'] = (strpos($directoryPath, DIRECTORY_SEPARATOR) !== 0) ? $prefix . $directoryPath : $directoryPath;
+        $directoryData['name'] = Path::stripName($directoryPath);
+        $directoryData['path'] = Path::valid(Disk::pathPrefixFor($disk)) . Path::valid($directoryPath);
         return $directoryData;
     }
 
@@ -92,23 +103,12 @@ class Directory
         $directories = Directory::allDirectoriesIn($disk);
         $searchedDirectories = [];
         foreach ($directories as $directory) {
-            if (strpos(strtolower(self::getNameFromPath($directory)), strtolower($searchedWord)) !== false) {
+            if (strpos(strtolower(Path::stripName($directory)), strtolower($searchedWord)) !== false) {
                 $searchedDirectories[] = Directory::getDirectoryMetaData($directory, $disk);
             }
         }
 
         return $searchedDirectories;
-    }
-
-    /**
-     * Returns name from a given path string
-     * @param string $path
-     * @return mixed
-     */
-    private static function getNameFromPath($path)
-    {
-        $result = array_reverse(explode(DIRECTORY_SEPARATOR, $path));
-        return $result[0];
     }
 
 }

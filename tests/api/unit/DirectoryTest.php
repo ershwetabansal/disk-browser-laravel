@@ -10,7 +10,7 @@ class DirectoryTest extends TestCase
     use DatabaseTransactions;
 
     private $testDirectory = 'elephants';
-    private $diskName = 'integration_disks';
+    private $testDisk = 'integration_tests';
 
     public function setUp()
     {
@@ -47,7 +47,7 @@ class DirectoryTest extends TestCase
 
     public function it_creates_a_directory_in_root_directory()
     {
-
+        $directory = \App\Filesystem\Directory::createDirectory($this->testDirectory, $this->testDisk);
     }
 
     public function it_creates_a_directory_in_a_given_directory()
@@ -115,6 +115,44 @@ class DirectoryTest extends TestCase
 
     }
 
+    /**
+     * @test
+     * @expectedException \App\Exceptions\Filesystem\PathNotFoundInDiskException
+     */
+    public function it_throws_an_exception_when_path_does_not_exist()
+    {
+        $this->assertFalse(\App\Filesystem\Directory::exists($this->testDisk, '/this-path-does-not-exist'));
+    }
+
+    /** @test */
+    public function it_returns_true_when_path_exists()
+    {
+        $this->assertTrue(\App\Filesystem\Directory::exists($this->testDisk, '/cats'));
+    }
+
+    /**
+     * @test
+     * @expectedException \App\Exceptions\Filesystem\DirectoryAlreadyExistsException
+     */
+    public function it_throws_an_exception_when_directory_already_exists_in_root_of_a_given_disk()
+    {
+        $this->assertFalse(\App\Filesystem\Directory::notExists('cats', $this->testDisk));
+    }
+
+    /**
+     * @test
+     * @expectedException \App\Exceptions\Filesystem\DirectoryAlreadyExistsException
+     */
+    public function it_throws_an_exception_when_directory_already_exists_in_a_given_path()
+    {
+        $this->assertFalse(\App\Filesystem\Directory::notExists('trained', $this->testDisk, '/dogs/puppies/'));
+    }
+
+    /** @test */
+    public function it_returns_true_when_directory_does_not_exists_in_a_given_path()
+    {
+        $this->assertTrue(\App\Filesystem\Directory::notExists('this-does-not-exist', $this->testDisk, '/dogs/'));
+    }
 
     /**
      * Delete a given directory
