@@ -23,20 +23,21 @@ class Path
     /**
      * It returns the valid path from the input string
      * @param string $path
+     * @param bool $isFile
      * @return string
      */
-    public static function valid($path)
+    public static function valid($path, $isFilePath = false)
     {
 
         if ($path == '/') {
             return $path;
         }
 
-        if (strpos($path, DIRECTORY_SEPARATOR) === 0) {
-            $path = substr($path, 1);
+        if (strpos($path, DIRECTORY_SEPARATOR) !== 0) {
+            $path = DIRECTORY_SEPARATOR . $path;
         }
 
-        if (strpos($path, DIRECTORY_SEPARATOR, (strlen($path) - 1)) !== (strlen($path) - 1)) {
+        if ($isFilePath == false && strpos($path, DIRECTORY_SEPARATOR, (strlen($path) - 1)) !== (strlen($path) - 1)) {
             $path = $path . DIRECTORY_SEPARATOR ;
         }
 

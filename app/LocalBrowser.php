@@ -35,13 +35,14 @@ class LocalBrowser implements DiskBrowserContract
     public function listFilesIn($path = DIRECTORY_SEPARATOR)
     {
         $files = [];
+        $path = $path ?: DIRECTORY_SEPARATOR;
 
         if (Directory::exists($this->disk, $path)) {
             $fileNames = File::filesIn($this->disk, $path);
 
             foreach( $fileNames as $file) {
                 if (File::isFileAllowedOnDisk($file, $this->disk) == true) {
-                    $fileMetaData = File::getFileMetaData($file, $this->disk);
+                    $fileMetaData = File::metaDataOf($file, $this->disk);
                     if ($fileMetaData != []) {
                         $files[] = $fileMetaData;
                     }
@@ -60,11 +61,13 @@ class LocalBrowser implements DiskBrowserContract
     public function listDirectoriesIn($path = DIRECTORY_SEPARATOR)
     {
         $directoriesList = [];
+        $path = $path ?: DIRECTORY_SEPARATOR;
+
         if (Directory::exists($this->disk, $path)) {
             $directories = Directory::directoriesIn($this->disk, $path);
 
             foreach( $directories as $directory ) {
-                $directoriesList[] = Directory::getDirectoryMetaData($directory, $this->disk);
+                $directoriesList[] = Directory::metaDataOf($directory, $this->disk);
             }
         }
 
@@ -81,12 +84,11 @@ class LocalBrowser implements DiskBrowserContract
     public function createDirectory($name, $path = DIRECTORY_SEPARATOR)
     {
         $path = $path ?: DIRECTORY_SEPARATOR;
-
         if (Directory::exists($this->disk, $path) && Directory::notExists($name, $this->disk, $path)) {
 
             Directory::createDirectory($name, $this->disk, $path );
 
-            return Directory::getDirectoryMetaData(Path::valid($path) . $name, $this->disk);
+            return Directory::metaDataOf(Path::valid($path) . $name , $this->disk);
         } else {
             throw new DirectoryAlreadyExistsException();
         }
@@ -100,11 +102,13 @@ class LocalBrowser implements DiskBrowserContract
      */
     public function createFile(UploadedFile $file, $path = DIRECTORY_SEPARATOR)
     {
+        $path = $path ?: DIRECTORY_SEPARATOR;
+
         $newFileName = File::generateUniqueFileName($file);
 
         if (Directory::exists($this->disk, $path)) {
             File::uploadFile($file, $newFileName, $this->disk, $path);
-            return File::getFileMetaData(Path::valid($path) . $newFileName, $this->disk);
+            return File::metaDataOf(Path::valid($path) . $newFileName, $this->disk);
         } else {
             return [];
         }

@@ -321,7 +321,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // And setup disk browser for 'integration_tests' disk
 
         // And create a directory in root directory
-        $this->browser->createDirectory($this->testDirectory, Null);
+        $this->browser->createDirectory($this->testDirectory);
 
         //And then try to create the directory with the same name again
         $this->browser->createDirectory($this->testDirectory);

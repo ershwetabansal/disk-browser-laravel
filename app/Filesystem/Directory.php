@@ -32,7 +32,7 @@ class Directory
      */
     public static function exists($disk, $path = DIRECTORY_SEPARATOR)
     {
-        if (!Storage::disk($disk)->has($path)) {
+        if ($path != DIRECTORY_SEPARATOR && !Storage::disk($disk)->has($path)) {
             throw new PathNotFoundInDiskException();
         }
         return true;
@@ -63,7 +63,7 @@ class Directory
      */
     public static function directoriesIn($disk, $path = DIRECTORY_SEPARATOR)
     {
-        return collect(Storage::disk($disk)->directories($path));
+        return Storage::disk($disk)->directories($path);
     }
 
     /**
@@ -83,12 +83,13 @@ class Directory
      * @param string $disk
      * @return array
      */
-    public static function getDirectoryMetaData($directoryPath, $disk)
+    public static function metaDataOf($directoryPath, $disk)
     {
         $directoryData = [];
 
+        $prefix = Disk::pathPrefixFor($disk);
         $directoryData['name'] = Path::stripName($directoryPath);
-        $directoryData['path'] = Path::valid(Disk::pathPrefixFor($disk)) . Path::valid($directoryPath);
+        $directoryData['path'] =  Path::valid(($prefix === '/' ? '' : $prefix) . $directoryPath);
         return $directoryData;
     }
 
@@ -104,7 +105,7 @@ class Directory
         $searchedDirectories = [];
         foreach ($directories as $directory) {
             if (strpos(strtolower(Path::stripName($directory)), strtolower($searchedWord)) !== false) {
-                $searchedDirectories[] = Directory::getDirectoryMetaData($directory, $disk);
+                $searchedDirectories[] = Directory::metaDataOf($directory, $disk);
             }
         }
 

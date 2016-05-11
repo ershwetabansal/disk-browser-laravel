@@ -39,7 +39,7 @@ class File
      * @param string $disk
      * @return int
      */
-    public static function getSizeOf($file, $disk)
+    public static function size($file, $disk)
     {
         return Storage::disk($disk)->size($file) / 1000;
     }
@@ -50,7 +50,7 @@ class File
      * @param string $disk
      * @return string
      */
-    public static function getLastModifiedOf($file, $disk)
+    public static function lastModified($file, $disk)
     {
         return date('Y-m-d H:i:s', Storage::disk($disk)->lastModified($file));
     }
@@ -72,15 +72,16 @@ class File
      * @param string $disk
      * @return array
      */
-    public static function getFileMetaData($file, $disk)
+    public static function metaDataOf($file, $disk)
     {
         $fileData = [];
 
+        $prefix = Disk::pathPrefixFor($disk);
         $fileName = Path::stripName($file);
         $fileData['name'] = $fileName;
-        $fileData['path'] = Path::valid(Disk::pathPrefixFor($disk)) . $file;
-        $fileData['size'] = self::getSizeOf($file, $disk);
-        $fileData['modified_at'] = self::getLastModifiedOf($file, $disk);
+        $fileData['path'] = Path::valid(($prefix== '/' ? '' : $prefix) . $file, true);
+        $fileData['size'] = self::size($file, $disk);
+        $fileData['modified_at'] = self::lastModified($file, $disk);
 
         return $fileData;
     }
@@ -112,7 +113,7 @@ class File
         $searchedFiles = [];
         foreach ($files as $file) {
             if (strpos(strtolower(Path::stripName($file)), strtolower($searchedWord)) !== false) {
-                $fileMetaData = self::getFileMetaData($file, $disk);
+                $fileMetaData = self::metaDataOf($file, $disk);
 
                 if ($fileMetaData != []) {
                     $searchedFiles[] = $fileMetaData;
