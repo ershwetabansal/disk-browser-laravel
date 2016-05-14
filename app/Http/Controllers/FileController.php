@@ -2,15 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Exceptions\Filesystem\PathNotFoundInDiskException;
-use App\Filesystem\Directory;
-use App\LocalBrowser;
-use Illuminate\Http\Request;
-
+use App\DiskBrowser;
 use App\Http\Requests;
+use Illuminate\Http\Request;
+use App\Filesystem\Directory;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GetFilesRequest;
 use App\Http\Requests\UploadFileRequest;
+use App\Exceptions\Filesystem\PathNotFoundInDiskException;
 
 class FileController extends Controller
 {
@@ -21,7 +20,7 @@ class FileController extends Controller
      */
     public function index(GetFilesRequest $request)
     {
-        $browser = new LocalBrowser($request->input('disk'));
+        $browser = new DiskBrowser($request->input('disk'));
 
         return $browser->listFilesIn($request->input('path'));
     }
@@ -34,7 +33,7 @@ class FileController extends Controller
      */
     public function store(UploadFileRequest $request)
     {
-        $browser = new LocalBrowser($request->input('disk'));
+        $browser = new DiskBrowser($request->input('disk'));
         return $browser->createFile($request->file('file'), $request->input('path'));
 
     }

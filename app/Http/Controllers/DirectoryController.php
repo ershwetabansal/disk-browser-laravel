@@ -3,13 +3,13 @@
 namespace App\Http\Controllers;
 
 
-use App\Filesystem\Directory;
-use App\Http\Requests\DeleteDirectoryRequest;
-use App\LocalBrowser;
+use App\DiskBrowser;
 use App\Http\Requests;
 use Illuminate\Http\Request;
+use App\Filesystem\Directory;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\GetDirectoriesRequest;
+use App\Http\Requests\DeleteDirectoryRequest;
 use App\Http\Requests\CreateNewDirectoryRequest;
 
 class DirectoryController extends Controller
@@ -23,7 +23,7 @@ class DirectoryController extends Controller
     public function index(GetDirectoriesRequest $request)
     {
 
-        $browser = new LocalBrowser($request->input('disk'));
+        $browser = new DiskBrowser($request->input('disk'));
 
         return $browser->listDirectoriesIn($request->input('path'));
     }
@@ -36,7 +36,7 @@ class DirectoryController extends Controller
     public function store(CreateNewDirectoryRequest $request)
     {
 
-        $browser = new LocalBrowser($request->input('disk'));
+        $browser = new DiskBrowser($request->input('disk'));
 
         $directoryDetails = $browser->createDirectory($request->input('name'), $request->input('path'));
 
@@ -53,7 +53,7 @@ class DirectoryController extends Controller
      */
     public function destroy(DeleteDirectoryRequest $request)
     {
-        $browser = new LocalBrowser($request->input('disk'));
+        $browser = new DiskBrowser($request->input('disk'));
 
         $result = $browser->deleteDirectory($request->input('path'));
 

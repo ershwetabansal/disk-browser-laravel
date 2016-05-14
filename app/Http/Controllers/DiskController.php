@@ -2,12 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\DiskSearchRequest;
-use App\LocalBrowser;
-use Illuminate\Http\Request;
-
+use App\DiskBrowser;
 use App\Http\Requests;
+use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\DiskSearchRequest;
 
 class DiskController extends Controller
 {
@@ -28,7 +27,7 @@ class DiskController extends Controller
      */
     public function search(DiskSearchRequest $request)
     {
-        $browser = new LocalBrowser($request->input('disk'));
+        $browser = new DiskBrowser($request->input('disk'));
 
         return $browser->searchDisk($request->input('search'));
     }

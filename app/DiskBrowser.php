@@ -2,14 +2,14 @@
 
 namespace App;
 
+use App\Filesystem\Path;
 use App\Filesystem\File;
 use App\Filesystem\Directory;
 use App\Filesystem\DiskBrowserContract;
-use App\Filesystem\Path;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use App\Exceptions\Filesystem\DirectoryAlreadyExistsException;
 
-class LocalBrowser implements DiskBrowserContract
+class DiskBrowser implements DiskBrowserContract
 {
 
     /**

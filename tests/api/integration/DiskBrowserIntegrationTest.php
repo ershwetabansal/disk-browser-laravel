@@ -41,7 +41,7 @@ class DiskBrowserIntegrationTest extends TestCase
         |  spreadsheet.xlsx
         */
 
-        $this->browser = new \App\LocalBrowser('integration_tests');
+        $this->browser = new \App\DiskBrowser('integration_tests');
     }
 
     public function tearDown()
