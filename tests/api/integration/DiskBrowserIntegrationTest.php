@@ -66,15 +66,15 @@ class DiskBrowserIntegrationTest extends TestCase
         $expectations = [
             [
                 'name' => 'cats',
-                'path' => '/cats/',
+                'path' => '/',
             ],
             [
                 'name' => 'dogs',
-                'path' => '/dogs/',
+                'path' => '/',
             ],
             [
                 'name' => 'monkeys',
-                'path' => '/monkeys/',
+                'path' => '/',
             ],
         ];
 
@@ -103,7 +103,7 @@ class DiskBrowserIntegrationTest extends TestCase
         $expectations = [
             [
                 'name' => 'puppies',
-                'path' => '/dogs/puppies/',
+                'path' => '/dogs/',
             ],
         ];
 
@@ -130,7 +130,7 @@ class DiskBrowserIntegrationTest extends TestCase
         $expectations = [
             [
                 'name' => 'trained',
-                'path' => '/dogs/puppies/trained/',
+                'path' => '/dogs/puppies/',
             ],
         ];
 
@@ -166,15 +166,15 @@ class DiskBrowserIntegrationTest extends TestCase
         $expectations = [
             [
                 'name' => 'i-love-this-dog.jpg',
-                'path' => '/i-love-this-dog.jpg',
+                'path' => '/',
             ],
             [
                 'name' => 'my-cat.jpg',
-                'path' => '/my-cat.jpg'
+                'path' => '/'
             ],
             [
                 'name' => 'my-dog.jpg',
-                'path' => '/my-dog.jpg'
+                'path' => '/'
             ],
         ];
 
@@ -205,7 +205,7 @@ class DiskBrowserIntegrationTest extends TestCase
         $expectations = [
             [
                 'name' => 'fat_cat.png',
-                'path' => '/cats/fat_cat.png',
+                'path' => '/cats/',
             ],
         ];
 
@@ -234,7 +234,7 @@ class DiskBrowserIntegrationTest extends TestCase
         $expectations = [
             [
                 'name' => 'cute_puppies.jpg',
-                'path' => '/dogs/puppies/cute_puppies.jpg',
+                'path' => '/dogs/puppies/',
             ],
         ];
 
@@ -269,7 +269,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // Then we see newly created directories' name and path
         $expectations = [
             'name' => $this->testDirectory,
-            'path' => '/' . $this->testDirectory . '/',
+            'path' => '/',
         ];
 
         $this->assertEquals($expectations['name'], $result['name']);
@@ -289,7 +289,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // Then we see newly created directories' name and path
         $expectations = [
             'name' => $this->testDirectory,
-            'path' => '/' . $this->testDirectory . '/',
+            'path' => '/',
         ];
 
         $this->assertEquals($expectations['name'], $result['name']);
@@ -334,7 +334,7 @@ class DiskBrowserIntegrationTest extends TestCase
 
         // And setup disk browser for 'integration_tests' disk
 
-        // And create a directory in root directory
+        // And we create a directory in root directory
         $this->browser->createDirectory($this->testDirectory);
 
         // And have a local file ready to upload
@@ -352,7 +352,7 @@ class DiskBrowserIntegrationTest extends TestCase
         $result = $this->browser->createFile($uploadedFile, '/' . $this->testDirectory);
 
         $this->assertContains('spreadsheet', $result['name']);
-        $this->assertContains('spreadsheet', $result['path']);
+        $this->assertEquals('/' . $this->testDirectory . '/', $result['path']);
         $this->asserttrue($result['size'] >= 0);
         $this->asserttrue($result['modified_at'] <= date('Y-m-d H:i:s'));
     }
@@ -380,29 +380,29 @@ class DiskBrowserIntegrationTest extends TestCase
             'directories' => [
                 [
                     'name' => 'cute',
-                    'path' => '/cats/cute/',
+                    'path' => '/cats/',
                 ],
                 [
                     'name' => 'cute',
-                    'path' => '/monkeys/cute/',
+                    'path' => '/monkeys/',
                 ]
             ],
             'files' => [
                 [
                     'name' => 'cute_cat.png',
-                    'path' => '/cats/cute/cute_cat.png'
+                    'path' => '/cats/cute/'
                 ],
                 [
                     'name' => 'cute_puppies.jpg',
-                    'path' => '/dogs/puppies/cute_puppies.jpg'
+                    'path' => '/dogs/puppies/'
                 ],
                 [
                     'name' => 'cute_and_trained_puppies.jpg',
-                    'path' => '/dogs/puppies/trained/cute_and_trained_puppies.jpg'
+                    'path' => '/dogs/puppies/trained/'
                 ],
                 [
                     'name' => 'cute_monkey.png',
-                    'path' => '/monkeys/cute/cute_monkey.png'
+                    'path' => '/monkeys/cute/'
                 ]
             ]
         ];
@@ -421,6 +421,55 @@ class DiskBrowserIntegrationTest extends TestCase
         }
     }
 
+    /** @test */
+    public function it_deletes_an_empty_directory()
+    {
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // And we create an empty directory in root of the given disk
+        $this->browser->createDirectory($this->testDirectory);
+
+        // we should be able to delete the test directory
+        $this->assertTrue($this->browser->deleteDirectory('/' . $this->testDirectory));
+
+        $this->assertFalse($this->doesExist('/' . $this->testDirectory));
+    }
+
+    /**
+     * @test
+     * @expectedException \App\Exceptions\Filesystem\DirectoryIsNotEmptyException
+     */
+    public function it_throws_an_exception_if_trying_to_delete_a_directory_that_has_subdirectories()
+    {
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // And we try to delete a directory which has sub-directories
+        $this->browser->deleteDirectory('/cats');
+
+        $this->assertTrue($this->doesExist('/cats'));
+
+    }
+
+    /**
+     * @test
+     * @expectedException \App\Exceptions\Filesystem\DirectoryIsNotEmptyException
+     */
+    public function it_throws_an_exception_if_trying_to_delete_a_directory_that_has_files()
+    {
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // And we try to delete a directory which has files in it
+        $this->browser->deleteDirectory('/cats/cute');
+
+        $this->assertTrue($this->doesExist('/cats/cute'));
+
+    }
 
     /**
      * Delete a given directory

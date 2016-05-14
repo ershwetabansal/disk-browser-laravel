@@ -193,7 +193,7 @@ class FileTest extends TestCase
         $result = \App\Filesystem\File::metaDataOf('/my-cat.jpg', $this->testDisk);
 
         $this->assertEquals('my-cat.jpg', $result['name']);
-        $this->assertEquals('/my-cat.jpg', $result['path']);
+        $this->assertEquals('/', $result['path']);
         $this->assertTrue($result['size'] >= 0);
         $this->assertTrue($result['modified_at'] < date('Y-m-d H:i:s'));
 
@@ -213,19 +213,19 @@ class FileTest extends TestCase
         $expectations = [
             [
                 'name' => 'cute_cat.png',
-                'path' => '/cats/cute/cute_cat.png'
+                'path' => '/cats/cute/'
             ],
             [
                 'name' => 'cute_puppies.jpg',
-                'path' => '/dogs/puppies/cute_puppies.jpg'
+                'path' => '/dogs/puppies/'
             ],
             [
                 'name' => 'cute_and_trained_puppies.jpg',
-                'path' => '/dogs/puppies/trained/cute_and_trained_puppies.jpg'
+                'path' => '/dogs/puppies/trained/'
             ],
             [
                 'name' => 'cute_monkey.png',
-                'path' => '/monkeys/cute/cute_monkey.png'
+                'path' => '/monkeys/cute/'
             ]
         ];
 
@@ -256,19 +256,19 @@ class FileTest extends TestCase
         $expectations = [
             [
                 'name' => 'cute_cat.png',
-                'path' => '/cats/cute/cute_cat.png'
+                'path' => '/cats/cute/'
             ],
             [
                 'name' => 'cute_puppies.jpg',
-                'path' => '/dogs/puppies/cute_puppies.jpg'
+                'path' => '/dogs/puppies/'
             ],
             [
                 'name' => 'cute_and_trained_puppies.jpg',
-                'path' => '/dogs/puppies/trained/cute_and_trained_puppies.jpg'
+                'path' => '/dogs/puppies/trained/'
             ],
             [
                 'name' => 'cute_monkey.png',
-                'path' => '/monkeys/cute/cute_monkey.png'
+                'path' => '/monkeys/cute/'
             ]
         ];
 

@@ -36,19 +36,19 @@ class PathTest extends TestCase
     public function it_should_return_valid_path_from_a_given_string_when_there_is_no_trailing_separator()
     {
 
-        $this->assertEquals(\App\Filesystem\Path::valid('cats/cat'), 'cats/cat/');
+        $this->assertEquals(\App\Filesystem\Path::valid('cats/cat'), '/cats/cat/');
     }
 
     /** @test */
     public function it_should_return_valid_path_from_a_given_string_when_there_is_a_leading_separator()
     {
-        $this->assertEquals(\App\Filesystem\Path::valid('/cats/cat/'), 'cats/cat/');
+        $this->assertEquals(\App\Filesystem\Path::valid('/cats/cat/'), '/cats/cat/');
     }
 
     /** @test */
     public function it_should_not_change_a_path_when_in_correct_format()
     {
-        $this->assertEquals(\App\Filesystem\Path::valid('cats/cat/'), 'cats/cat/');
+        $this->assertEquals(\App\Filesystem\Path::valid('cats/cat/'), '/cats/cat/');
     }
 
     /** @test */

@@ -91,14 +91,14 @@ class DiskBrowserTest extends TestCase
                 // Then I see the directories are as follows
                 ->seeJson([
                     'name' => 'cats',
-                    'path' => '/cats/',
+                    'path' => '/',
                 ])
                 ->seeJson([
                     'name' => 'monkeys',
-                    'path' => '/monkeys/'
+                    'path' => '/'
                 ])->seeJson([
                     'name' => 'dogs',
-                    'path' => '/dogs/'
+                    'path' => '/'
                 ])
 
                 // And there are only three directories returned
@@ -118,11 +118,11 @@ class DiskBrowserTest extends TestCase
             )
             ->seeJson([
                 'name' => 'angry',
-                'path' => '/monkeys/angry/'
+                'path' => '/monkeys/'
             ])
             ->seeJson([
                 'name' => 'cute',
-                'path' => '/monkeys/cute/'
+                'path' => '/monkeys/'
             ])
 
             // And there are only two directories returned.
@@ -145,7 +145,7 @@ class DiskBrowserTest extends TestCase
             // Then I see the following directory
             ->seeJson([
                 'name' => 'trained',
-                'path' => '/dogs/puppies/trained/',
+                'path' => '/dogs/puppies/',
             ])
 
             // And there is only one directory returned.
@@ -184,17 +184,17 @@ class DiskBrowserTest extends TestCase
             //Then I see the following files
             ->seeJson([
                 'name' => 'i-love-this-dog.jpg',
-                'path' => '/i-love-this-dog.jpg',
+                'path' => '/',
                 'size' => 4.048,
             ])
             ->seeJsonContains([
                 'name' => 'my-dog.jpg',
-                'path' => '/my-dog.jpg',
+                'path' => '/',
                 'size' => 4.048,
             ])
             ->seeJsonContains([
                 'name' => 'my-cat.jpg',
-                'path' => '/my-cat.jpg',
+                'path' => '/',
                 'size' => 4.048,
             ]);
         
@@ -245,7 +245,7 @@ class DiskBrowserTest extends TestCase
             //Then I see the following files
             ->seeJson([
                 'name' => 'fat_cat.png',
-                'path' => '/cats/fat_cat.png',
+                'path' => '/cats/',
                 'size' => 0,
             ]);
 
@@ -275,12 +275,12 @@ class DiskBrowserTest extends TestCase
             //Then I see the following files
             ->seeJson([
                 'name' => 'cute_and_trained_puppies.jpg',
-                'path' => '/dogs/puppies/trained/cute_and_trained_puppies.jpg',
+                'path' => '/dogs/puppies/trained/',
                 'size' => 0,
             ])
             ->seeJson([
                 'name' => 'trained_puppies.jpg',
-                'path' => '/dogs/puppies/trained/trained_puppies.jpg',
+                'path' => '/dogs/puppies/trained/',
                 'size' => 0,
             ]);
 
@@ -331,7 +331,7 @@ class DiskBrowserTest extends TestCase
                 'success' => true,
                 'directory' => [
                     'name' => $this->testDirectory,
-                    'path' => '/' . $this->testDirectory . '/',
+                    'path' => '/',
                 ]
             ]);
 
@@ -405,7 +405,7 @@ class DiskBrowserTest extends TestCase
                 'success' => true,
                 'directory' => [
                     'name' => $this->testDirectory,
-                    'path' => '/' . $this->testDirectory . '/' . $this->testDirectory . '/',
+                    'path' => '/' . $this->testDirectory . '/' ,
                 ]
             ]);
 
@@ -556,11 +556,11 @@ class DiskBrowserTest extends TestCase
                     'directories' => [
                         [
                             'name' => 'cute',
-                            'path' => '/cats/cute/',
+                            'path' => '/cats/',
                         ],
                         [
                             'name' => 'cute',
-                            'path' => '/monkeys/cute/',
+                            'path' => '/monkeys/',
                         ]
                     ],
                 ]
@@ -568,33 +568,102 @@ class DiskBrowserTest extends TestCase
             ->seeJsonContains(
                 [
                     'name' => 'cute_cat.png',
-                    'path' => '/cats/cute/cute_cat.png',
+                    'path' => '/cats/cute/',
                     'size' => 0,
                 ]
             )
             ->seeJsonContains(
                 [
                     'name' => 'cute_puppies.jpg',
-                    'path' => '/dogs/puppies/cute_puppies.jpg',
+                    'path' => '/dogs/puppies/',
                     'size' => 0,
                 ]
             )
             ->seeJsonContains(
                 [
                     'name' => 'cute_and_trained_puppies.jpg',
-                    'path' => '/dogs/puppies/trained/cute_and_trained_puppies.jpg',
+                    'path' => '/dogs/puppies/trained/',
                     'size' => 0,
                 ]
             )
             ->seeJsonContains(
                 [
                     'name' => 'cute_monkey.png',
-                    'path' => '/monkeys/cute/cute_monkey.png',
+                    'path' => '/monkeys/cute/',
                     'size' => 0,
                 ]
             );
 
 
+    }
+
+    /** @test */
+    public function it_deletes_an_empty_directory()
+    {
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // And there is one empty directory created
+        $this->json('post', '/api/v1/directory/store',
+            ['disk' => 'integration_tests', 'name' => $this->testDirectory]
+        );
+
+        // And I make a POST request to /api/v1/directory/destroy with a directory path
+        $this->json('post', '/api/v1/directory/destroy',
+            ['disk' => 'integration_tests', 'path' => '/' . $this->testDirectory]
+
+        )->seeJson([
+            'success' => true,
+        ]);
+
+
+        $this->assertFalse($this->doesExist('/' . $this->testDirectory));
+
+    }
+
+    /** @test */
+    public function it_returns_error_if_trying_to_delete_a_directory_that_has_subdirectories()
+    {
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // And I make a POST request to /api/v1/directory/destroy with a directory path which has sub-directories
+        $this->json('post', '/api/v1/directory/destroy',
+            ['disk' => 'integration_tests', 'path' => '/cats']
+
+        )->seeJson([
+            'success' => false,
+            'errors' => [
+                'Directory is not empty and can not be deleted.'
+            ]
+        ]);
+
+        // Directory should still exist
+        $this->assertTrue($this->doesExist('/cats'));
+    }
+
+    /** @test */
+    public function it_returns_error_if_trying_to_delete_a_directory_that_has_files()
+    {
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // And I make a POST request to /api/v1/directory/destroy with a directory path which has files
+        $this->json('post', '/api/v1/directory/destroy',
+            ['disk' => 'integration_tests', 'path' => '/cats/cute']
+
+        )->seeJson([
+            'success' => false,
+            'errors' => [
+                'Directory is not empty and can not be deleted.'
+            ]
+        ]);
+
+        // Directory should still exist
+        $this->assertTrue($this->doesExist('/cats/cute'));
     }
 
     /**

@@ -156,7 +156,7 @@ class DirectoryTest extends TestCase
         // It should return directory meta data
         $this->assertEquals(\App\Filesystem\Directory::metaDataOf('/cats', $this->testDisk),
             ['name' => 'cats',
-             'path' => '/cats/']
+             'path' => '/']
         );
 
     }
@@ -174,11 +174,11 @@ class DirectoryTest extends TestCase
         $expectations = [
             [
                 'name' => 'cute',
-                'path' => '/cats/cute/',
+                'path' => '/cats/',
             ],
             [
                 'name' => 'cute',
-                'path' => '/monkeys/cute/',
+                'path' => '/monkeys/',
             ]
         ];
 
@@ -220,7 +220,7 @@ class DirectoryTest extends TestCase
         $expectations = [
             [
                 'name' => 'puppies',
-                'path' => '/dogs/puppies/',
+                'path' => '/dogs/',
             ]
         ];
 
@@ -282,7 +282,85 @@ class DirectoryTest extends TestCase
         $this->assertFalse(\App\Filesystem\Directory::notExists('trained', $this->testDisk, '/dogs/puppies/'));
     }
 
+    /** @test */
+    public function it_returns_true_if_a_directory_is_empty()
+    {
+        // Given there is a disk named 'integration_tests'.
 
+        // And it has the usual directory structure.
+
+        // And there is an empty directory in the root of the disk
+        \App\Filesystem\Directory::createDirectory($this->testDirectory, $this->testDisk);
+
+        // Then we see that the directory is empty
+        $this->assertTrue(\App\Filesystem\Directory::isEmpty($this->testDirectory, $this->testDisk));
+    }
+
+    /** @test */
+    public function it_returns_false_if_a_directory_is_not_empty()
+    {
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // And there is non empty directory in the disk
+
+        // If directory has subdirectories, we see that directory is not empty
+        $this->assertFalse(\App\Filesystem\Directory::isEmpty('cats', $this->testDisk));
+
+        // If directory has files, we see that directory is not empty
+        $this->assertFalse(\App\Filesystem\Directory::isEmpty('cats/cute', $this->testDisk));
+
+    }
+
+    /** @test */
+    public function it_deletes_an_empty_directory()
+    {
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // When we add a directory in the root of the disk
+        \App\Filesystem\Directory::createDirectory($this->testDirectory, $this->testDisk);
+
+        // We are able to delete the same
+        $this->assertTrue(\App\Filesystem\Directory::delete($this->testDirectory, $this->testDisk));
+
+        $this->assertFalse($this->doesExist('/' . $this->testDirectory));
+    }
+
+    /**
+     * @test
+     * @expectedException \App\Exceptions\Filesystem\DirectoryIsNotEmptyException
+     */
+    public function it_throws_an_exception_if_trying_to_delete_a_directory_that_has_subdirectories()
+    {
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // We can not delete the directory which has subdirectories
+        \App\Filesystem\Directory::delete('cats', $this->testDisk);
+
+        $this->assertTrue($this->doesExist('/cats'));
+
+    }
+
+    /**
+     * @test
+     * @expectedException \App\Exceptions\Filesystem\DirectoryIsNotEmptyException
+     */
+    public function it_throws_an_exception_if_trying_to_delete_a_directory_that_has_files()
+    {
+        // Given there is a disk named 'integration_tests'.
+
+        // And it has the usual directory structure.
+
+        // We can not delete the directory which has files
+        \App\Filesystem\Directory::delete('cats/cute', $this->testDisk);
+
+        $this->assertTrue($this->doesExist('/cats/cute'));
+    }
     /**
      * Delete a given directory
      * @param string $directory
