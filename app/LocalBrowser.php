@@ -127,4 +127,15 @@ class LocalBrowser implements DiskBrowserContract
         ];
     }
 
+    /**
+     * Delete a directory only if directory is empty
+     * @param string $directory
+     * @return boolean
+     * @throws Exceptions\Filesystem\DirectoryIsNotEmptyException
+     */
+    public function deleteDirectory($directory)
+    {
+        return Directory::delete($directory, $this->disk);
+    }
+
 }

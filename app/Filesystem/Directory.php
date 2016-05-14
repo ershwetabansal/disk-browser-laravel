@@ -4,6 +4,7 @@ namespace App\Filesystem;
 
 use App\Disks\Disk;
 use App\Exceptions\Filesystem\DirectoryAlreadyExistsException;
+use App\Exceptions\Filesystem\DirectoryIsNotEmptyException;
 use App\Exceptions\Filesystem\PathNotFoundInDiskException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
@@ -83,12 +84,14 @@ class Directory
      * @param string $disk
      * @return array
      */
-    public static function metaDataOf($directoryPath, $disk)
+    public static function metaDataOf($directory, $disk)
     {
         $directoryData = [];
 
         $prefix = Disk::pathPrefixFor($disk);
-        $directoryData['name'] = Path::stripName($directoryPath);
+        $directoryName = Path::stripName($directory);
+        $directoryPath = substr($directory, 0, strlen($directory) - strlen($directoryName));
+        $directoryData['name'] = $directoryName;
         $directoryData['path'] =  Path::valid(($prefix === '/' ? '' : $prefix) . $directoryPath);
         return $directoryData;
     }
@@ -110,6 +113,35 @@ class Directory
         }
 
         return $searchedDirectories;
+    }
+
+    /**
+     * Deletes a directory in a given disk
+     * @param $disk
+     * @param $directory
+     * @return mixed
+     * @throws DirectoryIsNotEmptyException
+     */
+    public static function delete($directory, $disk)
+    {
+        if (self::isEmpty($directory, $disk)) {
+            return Storage::disk($disk)->deleteDirectory($directory);
+        } else {
+            throw new DirectoryIsNotEmptyException;
+        }
+
+    }
+
+    /**
+     * Returns true if a directory is empty
+     * @param $directory
+     * @param $disk
+     * @return bool
+     */
+    public static function isEmpty($directory, $disk)
+    {
+        return (sizeof(self::directoriesIn($disk, $directory)) == 0) &&
+               (sizeof(File::filesIn($disk, $directory)) == 0);
     }
 
 }

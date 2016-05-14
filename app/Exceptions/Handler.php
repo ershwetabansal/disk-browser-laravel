@@ -3,6 +3,7 @@
 namespace App\Exceptions;
 
 use App\Exceptions\Filesystem\DirectoryAlreadyExistsException;
+use App\Exceptions\Filesystem\DirectoryIsNotEmptyException;
 use App\Exceptions\Filesystem\PathNotFoundInDiskException;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -45,11 +46,24 @@ class Handler extends ExceptionHandler
     public function render($request, Exception $e)
     {
         if ($e instanceof PathNotFoundInDiskException) {
-            return response(['errors' => ['Path does not exist.']],422);
+            return response([
+                'success' => false,
+                'errors' => ['Path does not exist.'],
+            ],422);
         }
 
         if ($e instanceof DirectoryAlreadyExistsException) {
-            return response(['errors' => ['Directory already exists in the given path.']],422);
+            return response([
+                'success' => false,
+                'errors' => ['Directory already exists in the given path.'],
+            ],422);
+        }
+
+        if ($e instanceof DirectoryIsNotEmptyException) {
+            return response([
+                'success' => false,
+                'errors' => ['Directory is not empty and can not be deleted.'],
+            ],422);
         }
 
         return parent::render($request, $e);

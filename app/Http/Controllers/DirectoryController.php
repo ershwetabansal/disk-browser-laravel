@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 
 use App\Filesystem\Directory;
+use App\Http\Requests\DeleteDirectoryRequest;
 use App\LocalBrowser;
 use App\Http\Requests;
 use Illuminate\Http\Request;
@@ -46,48 +47,19 @@ class DirectoryController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * Delete a directory if empty
+     * @param DeleteDirectoryRequest $request
+     * @return array
      */
-    public function show($id)
+    public function destroy(DeleteDirectoryRequest $request)
     {
-        //
-    }
+        $browser = new LocalBrowser($request->input('disk'));
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+        $result = $browser->deleteDirectory($request->input('path'));
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        return [
+            'success' => $result
+        ];
     }
 
 
