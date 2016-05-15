@@ -3,7 +3,7 @@ var util = require('../helpers/util.js');
 var mock = require('../mock/mock.js');
 
 var diskHandler, dirHandler, fileHandler, eventHandler;
-var disksParam, directoriesParam, filesParam, httpParams, authParams, modalBoxParams;
+var disksParam = {}, directoriesParam = {}, filesParam = {}, httpParams = {}, authParams = {}, modalBoxParams = {};
 
 /************************************************
 * Setup
@@ -16,11 +16,11 @@ function setupHandlers(disk, dir, file, eventH) {
 }
 
 function setupParameters(disk, dir, files, http, auth) {
-	disksParam = disk;
-	directoriesParam = dir;
-	filesParam = files;
-    httpParams = http;
-    authParams = auth;
+	disksParam = disk || {};
+	directoriesParam = dir || {};
+	filesParam = files || {};
+    httpParams = http || {};
+    authParams = auth || {};
 }
 
 function setupElements() {
@@ -88,7 +88,7 @@ function setupEvents() {
 ************************************************/
 
 function load(modalBoxParameters) {
-    modalBoxParams = modalBoxParameters;
+    modalBoxParams = modalBoxParameters || {};
 	eventHandler.resetView();
 	loadDisks();
 	loadDirectories();

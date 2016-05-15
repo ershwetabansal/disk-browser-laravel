@@ -75,10 +75,12 @@ describe("File browser should be able to manage files and ", function() {
 
     it("should return the selected file details.", function() {
 
-    	var fileElement = element.getFilesGrid().find('li').eq(0);
+		setup.getFileHandler().showFileGrid();
+
+		var fileElement = element.getFilesGrid().find('li').eq(0);
     	element.select(element.getFilesGrid(), fileElement);
 
-    	expect(setup.getFileHandler().getCurrentFileDetails().name).toBe(fileElement.text());
+		expect(setup.getFileHandler().getCurrentFileDetails().name).toBe(fileElement.text());
 
     });
 

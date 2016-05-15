@@ -2,7 +2,7 @@
 function setUpHTMLFixture() {
 	document.body.innerHTML = '<div id="FileBrowser">' + 
 		'<div class="directories">' +
-		'<ul id="disk_navbar" class="nav nav-tabs nav-justified"></ul>' +
+		'<select id="disk_selector"></select>' +
 		'<ul id="directories-list"></ul>' +
 		'</div>' +
 		'<div class="files">' +
@@ -26,13 +26,11 @@ function getDiskData() {
            name: 'Images',
            label: 'Image Folder',
            absolute_path: false,
-           search: '/asset/file/search'
        },
        {
            name: 'S3',
            label: 'AWS S3',
            absolute_path: false,
-           search: '/asset/file/search'
        }
     ];
 }
@@ -95,19 +93,18 @@ function getFilesData() {
 function getSetupObject() {
 	return {
 		disks : {
+            search_URL : '/asset/file/search',
 	        search : true,
 	        details : [
 	         {
 	             name: 'Images',
 	             label: 'Image Folder',
-	             absolute_path: false,
-	             search_URL: '/asset/file/search'
+	             absolute_path: false
 	         },
 	         {
 	             name: 'S3',
 	             label: 'AWS S3',
-	             absolute_path: false,
-	             search_URL: '/asset/file/search'
+	             absolute_path: false
 	         }
 	      ]
 	    },

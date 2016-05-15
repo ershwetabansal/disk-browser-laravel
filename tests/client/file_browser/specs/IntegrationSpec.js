@@ -30,9 +30,7 @@ describe("File browser should be able to manage disks, directories and files. Us
     it("should be able to open any disk and should see directories. On click of a directory, files should load.", function(done) {
 
     	diskHandler.loadDisks(stub.getDiskData());
-    	var disk = element.getDiskNavbar().find('li').eq(1);
-    	disk.click();
-
+        
     	expect(element.getDirectories().find('li').length).toBeGreaterThan(0);
 
         var directory = element.getDirectories().find('li').eq(1).find('> div');

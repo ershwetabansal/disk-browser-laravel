@@ -11,7 +11,7 @@ describe("File browser should be able to manage disks and ", function() {
     
   it("should be able to load disks when opens up", function() {
     setup.getDiskHandler().loadDisks(stub.getDiskData());
-    expect(element.getDiskNavbar().find('li').length).toBeGreaterThan(0);
+    expect(element.getDiskDropdown().find('option').length).toBeGreaterThan(0);
   });
 
 });
