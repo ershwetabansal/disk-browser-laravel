@@ -80,7 +80,7 @@ class File
         $fileName = Path::stripName($file);
         $filePath = substr($file, 0, strlen($file) - strlen($fileName));
         $fileData['name'] = $fileName;
-        $fileData['path'] = Path::valid(($prefix== '/' ? '' : $prefix) . $filePath);
+        $fileData['path'] = Path::valid(($prefix === DIRECTORY_SEPARATOR ? '' : $prefix) . $filePath);
         $fileData['size'] = self::size($file, $disk);
         $fileData['modified_at'] = self::lastModified($file, $disk);
 

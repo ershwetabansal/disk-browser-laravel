@@ -37,8 +37,8 @@ class Disk
 
         $path = DIRECTORY_SEPARATOR;
 
-        if ($diskData && isset($diskData['path'])) {
-            $path = $diskData['path'];
+        if ($diskData && isset($diskData['pathPrefix'])) {
+            $path = $diskData['pathPrefix'];
         }
 
         return $path;
