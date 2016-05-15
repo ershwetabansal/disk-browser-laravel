@@ -85,22 +85,19 @@ function attachSearchFilesEvent() {
 
     function addDisksSearch() {
     	var disksParam = reqHandler.getDiskParameter();
-	    if (disksParam.details) {
+		if (disksParam.details && disksParam.search_URL) {
 	    	for (var i=0, len = disksParam.details.length; i < len; i++) {
 	    		var disk = disksParam.details[i];
 	    		var id = 'search_' + util.slugify(disk.label);
-	    		if (disksParam.search_URL) {
-		    		element.getFileSearchOptions().append($(searchLiElement(id, disk.label, 'fa-server')));
-		    		attachDiskSearchEvent(id, disksParam.search_URL, disk.name);
-	    		}
+				element.getFileSearchOptions().append($(searchLiElement(id, disk.label, 'fa-server')));
+				attachDiskSearchEvent(id, disksParam.search_URL, disk.name);
 	    	}
 	    }
     }
 
     function attachDiskSearchEvent(id, url, diskName) {
     	element.getFileSearchOptions().find('#'+id).click(function() {
-            console.log(diskName);
-    		var liElement = $(this);
+			var liElement = $(this);
             var params = {
                 'search': element.getSearchInput().val(),
                 'disk': diskName

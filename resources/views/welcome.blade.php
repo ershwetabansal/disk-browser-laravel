@@ -121,11 +121,6 @@
                             </form>
                             <div class="text-center hidden" id="upload_file_loading"><i class="fa fa-spinner fa-spin fa-2x"></i></div>
                         </div>
-                        <div id="search-enabled" class="hidden">
-                            <label>Search :</label>
-                            <button id="current-directory-search"></button>
-                            <button id="disk-search">This disk</button>
-                        </div>
                         <table id="files-list" class="table hidden"></table>
                         <ul id="files-grid" class="list-unstyled hidden"></ul>
                     </div>
@@ -142,7 +137,7 @@
 </div>
 
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+<script src="js/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js" ></script>
 <script src="http://code.jquery.com/ui/1.9.2/jquery-ui.js"></script>
 

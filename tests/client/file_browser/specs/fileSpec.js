@@ -23,8 +23,8 @@ describe("File browser should be able to manage files and ", function() {
 
     	setup.getFileHandler().showFileList();
 
-    	expect(element.getFilesList().attr('class')).not.toBe('hidden');
-    	expect(element.getFilesGrid().attr('class')).toBe('hidden'); 	
+    	expect(element.getFilesList().attr('class')).not.toContain('hidden');
+    	expect(element.getFilesGrid().attr('class')).toContain('hidden');
 
     });
 
@@ -32,8 +32,8 @@ describe("File browser should be able to manage files and ", function() {
 
     	setup.getFileHandler().showFileGrid();
 
-    	expect(element.getFilesList().attr('class')).toBe('hidden');
-    	expect(element.getFilesGrid().attr('class')).not.toBe('hidden'); 	
+    	expect(element.getFilesList().attr('class')).toContain('hidden');
+    	expect(element.getFilesGrid().attr('class')).not.toContain('hidden');
 
     });
 

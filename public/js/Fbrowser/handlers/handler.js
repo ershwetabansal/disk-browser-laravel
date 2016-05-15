@@ -79,7 +79,7 @@ function setupEvents() {
 	eventHandler.attachAlignFilesAsGridEvent();
 
 	//Setup search events	
-	eventHandler.attachSearchFilesEvent(disksParam && disksParam.search);
+	eventHandler.attachSearchFilesEvent();
 
 }
 
@@ -268,11 +268,8 @@ function getDiskParameter() {
  ************************************************/
 
 function getAbsolutePath(file, path) {
-	if (file.path) {
-		return file.path;
-	} else if (typeof(path) != 'undefined') {
-		return path + '/' +file.name;
-	}
+	path = file.path || path;
+	return path + ((path.endsWith('/') ? '' : '/')) + file.name;
 }
 
 function getRootPathForCurrentDir() {
@@ -300,6 +297,7 @@ function makeAjaxRequest(url, successCallback, failureCallback, cache, data, isU
     $.ajax(getAjaxParameters()).success(function (data) {
         if (successCallback) successCallback(data);
         showLoadingBar(false);
+		element.getErrorMessagePlaceHolder().text('');
     }).fail(function (response) {
         if (failureCallback) failureCallback(response);
         showLoadingBar(false);
