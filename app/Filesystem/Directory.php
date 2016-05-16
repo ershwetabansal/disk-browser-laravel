@@ -88,11 +88,10 @@ class Directory
     {
         $directoryData = [];
 
-        $prefix = Disk::pathPrefixFor($disk);
         $directoryName = Path::stripName($directory);
         $directoryPath = substr($directory, 0, strlen($directory) - strlen($directoryName));
         $directoryData['name'] = $directoryName;
-        $directoryData['path'] =  Path::valid(($prefix === '/' ? '' : $prefix) . $directoryPath);
+        $directoryData['path'] =  Path::valid($directoryPath);
         return $directoryData;
     }
 

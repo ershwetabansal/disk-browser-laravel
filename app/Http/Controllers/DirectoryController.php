@@ -55,7 +55,7 @@ class DirectoryController extends Controller
     {
         $browser = new DiskBrowser($request->input('disk'));
 
-        $result = $browser->deleteDirectory($request->input('path'));
+        $result = $browser->deleteDirectory( $request->input('name'), $request->input('path'));
 
         return [
             'success' => $result

@@ -432,7 +432,7 @@ class DiskBrowserIntegrationTest extends TestCase
         $this->browser->createDirectory($this->testDirectory);
 
         // we should be able to delete the test directory
-        $this->assertTrue($this->browser->deleteDirectory('/' . $this->testDirectory));
+        $this->assertTrue($this->browser->deleteDirectory($this->testDirectory, '/'));
 
         $this->assertFalse($this->doesExist('/' . $this->testDirectory));
     }
@@ -448,7 +448,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // And it has the usual directory structure.
 
         // And we try to delete a directory which has sub-directories
-        $this->browser->deleteDirectory('/cats');
+        $this->browser->deleteDirectory('cats', '/');
 
         $this->assertTrue($this->doesExist('/cats'));
 
@@ -465,7 +465,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // And it has the usual directory structure.
 
         // And we try to delete a directory which has files in it
-        $this->browser->deleteDirectory('/cats/cute');
+        $this->browser->deleteDirectory('cute', '/cats/');
 
         $this->assertTrue($this->doesExist('/cats/cute'));
 

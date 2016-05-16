@@ -611,7 +611,7 @@ class DiskBrowserTest extends TestCase
 
         // And I make a POST request to /api/v1/directory/destroy with a directory path
         $this->json('post', '/api/v1/directory/destroy',
-            ['disk' => 'integration_tests', 'path' => '/' . $this->testDirectory]
+            ['disk' => 'integration_tests', 'path' => '/' , 'name' => $this->testDirectory]
 
         )->seeJson([
             'success' => true,
@@ -631,7 +631,7 @@ class DiskBrowserTest extends TestCase
 
         // And I make a POST request to /api/v1/directory/destroy with a directory path which has sub-directories
         $this->json('post', '/api/v1/directory/destroy',
-            ['disk' => 'integration_tests', 'path' => '/cats']
+            ['disk' => 'integration_tests', 'path' => '/', 'name' => 'cats']
 
         )->seeJson([
             'success' => false,
@@ -653,7 +653,7 @@ class DiskBrowserTest extends TestCase
 
         // And I make a POST request to /api/v1/directory/destroy with a directory path which has files
         $this->json('post', '/api/v1/directory/destroy',
-            ['disk' => 'integration_tests', 'path' => '/cats/cute']
+            ['disk' => 'integration_tests', 'path' => '/cats/', 'name' => 'cute']
 
         )->seeJson([
             'success' => false,

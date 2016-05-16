@@ -130,12 +130,13 @@ class DiskBrowser implements DiskBrowserContract
     /**
      * Delete a directory only if directory is empty
      * @param string $directory
-     * @return boolean
+     * @param string $path
+     * @return bool
      * @throws Exceptions\Filesystem\DirectoryIsNotEmptyException
      */
-    public function deleteDirectory($directory)
+    public function deleteDirectory($directory, $path)
     {
-        return Directory::delete($directory, $this->disk);
+        return Directory::delete(Path::valid($path) . $directory, $this->disk);
     }
 
 }

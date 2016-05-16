@@ -28,6 +28,7 @@ class DeleteDirectoryRequest extends Request
         return [
             'disk' => 'required|in:' . implode(',', array_keys($disks)),
             'path' => 'required',
+            'name' => 'required',
         ];
     }
 
