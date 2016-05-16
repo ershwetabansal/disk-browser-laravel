@@ -19,7 +19,7 @@ function file() {
         showFiles();
     }
 
-    //Show files function can be called when we click on the library or
+    // Show files function can be called when we click on the directory or
     // when we search a file
     function showFiles(filesArray) {
         resetFiles();
@@ -33,50 +33,73 @@ function file() {
         function loadFileGrid(filesArray) {
             var rootPath = reqHandler.getRootPathForCurrentDir();
 
-            for (var i=0, len = filesArray.length; i < len; i++) {
-                var file = filesArray[i];
-                file.id = util.slugify(file.name);
-                var gridElements = '<li id="'+file.id+'" tabindex="1"><div>';
-                file.type = file.type || util.getFileType(file.name);
+            var gridMetaData = fileWindowMetaData(true);
+            gridMetaData.length = filesArray.length;
+            attachScrollEventToFileWindow(filesArray, gridMetaData, loadGridImages);
 
-                var path = reqHandler.getAbsolutePath(file, rootPath);
-
-                gridElements += (util.isImage(file.type)) ? '<img src="' + path + '" alt="' + file.name + '"/>'
-                                :
-                                '<i class="big-icon fa ' + util.getFontAwesomeClass(file.type) + ' fa-3x"></i>';
-                gridElements += '<div>' + file.name + '</div>';
-
-                gridElements += '</li>';
-                element.getFilesGrid().append($(gridElements));
+            for (var i=0; i < gridMetaData.length; i++) {
+                loadGridImages(i);
             }
+
+            function loadGridImages(i) {
+                var file = filesArray[i];
+                if (file) {
+                    file.id = util.slugify(file.name);
+                    var gridElements = '<li id="'+file.id+'" tabindex="1"><div>';
+                    file.type = file.type || util.getFileType(file.name);
+
+                    var path = reqHandler.getAbsolutePath(file, rootPath);
+
+                    gridElements += (util.isImage(file.type)) ? '<img src="' + path + '" alt="' + file.name + '"/>'
+                        :
+                    '<i class="big-icon fa ' + util.getFontAwesomeClass(file.type) + ' fa-3x"></i>';
+                    gridElements += '<div>' + file.name + '</div>';
+
+                    gridElements += '</li>';
+                    element.getFilesGrid().append($(gridElements));
+                }
+            }
+
         }
-       
+
         function loadFileList(filesArray) {
             var rootPath = reqHandler.getRootPathForCurrentDir();
             appendFileHeader();
             var tableBody = element.getFilesList().find('tbody');
-            for (var i=0, len = filesArray.length; i < len; i++) {
+
+            var listMetaData = fileWindowMetaData(false);
+            listMetaData.length = filesArray.length;
+            // TODO Need to fix the issue of lazy loading in file list
+            // attachScrollEventToFileWindow(filesArray, listMetaData, loadListImages);
+
+            for (var i=0, len = listMetaData.length; i < len; i++) {
+                loadListImages(i);
+            }
+
+            function loadListImages(i) {
                 var file = filesArray[i];
-                file.id = util.slugify(file.name);
-                file.type = file.type || util.getFileType(file.name);
-                var path = reqHandler.getAbsolutePath(file, rootPath);
+                if (file) {
+                    file.id = util.slugify(file.name);
+                    file.type = file.type || util.getFileType(file.name);
+                    var path = reqHandler.getAbsolutePath(file, rootPath);
 
-                var listElements = '<tr id="'+file.id+'" tabindex="1">';
+                    var listElements = '<tr id="'+file.id+'" tabindex="1">';
 
-                for (var key in reqHandler.getFileResponseParams()) {
-                    listElements += '<td>';
-                    if (key == 'name') {
-                        listElements += (util.isImage(file.type)) ? '<img src="' + path + '" alt="' + file.name + '"/>'
-                            :
+                    for (var key in reqHandler.getFileResponseParams()) {
+                        listElements += '<td>';
+                        if (key == 'name') {
+                            listElements += (util.isImage(file.type)) ? '<img src="' + path + '" alt="' + file.name + '"/>'
+                                :
                             '<i class="small-icon fa ' + util.getFontAwesomeClass(file.type) + '"></i>';
+                        }
+                        listElements += file[key];
+                        listElements += '</td>';
                     }
-                    listElements += file[key];
-                    listElements += '</td>';
+
+                    listElements += '</tr>';
+
+                    tableBody.append($(listElements));
                 }
-
-                listElements += '</tr>';
-
-                tableBody.append($(listElements));
             }
 
             function appendFileHeader() {
@@ -96,6 +119,60 @@ function file() {
                     sortFilesBy($(this).attr('id'), !isAsc);
                 });
             }
+        }
+
+
+        function attachScrollEventToFileWindow(filesArray, metaData, loadImageCallBack) {
+            if (filesArray.length > metaData.stepUpNumber) {
+                metaData.length = metaData.stepUpNumber;
+
+                element.getFileWindow().unbind('scroll');
+                element.getFileWindow().scroll(function(e){
+                    var numberOfImagesViewed = lastImageInViewPort(metaData);
+                    if (filesArray.length > metaData.length) {
+                        if (numberOfImagesViewed > metaData.length - metaData.numberX * metaData.numberY){
+                            for (var i=Math.round(metaData.length); i < metaData.length + metaData.stepUpNumber || i < filesArray.length; i++) {
+                                loadImageCallBack(i);
+                            }
+                            metaData.length = metaData.length + metaData.stepUpNumber;
+                        }
+                    } else {
+                        element.getFileWindow().off('scroll');
+                    }
+                });
+            }
+        }
+
+        function fileWindowMetaData(isGrid) {
+            var metaData = {};
+
+            var fileWindow = element.getFileWindow();
+            var imgBlockHeight, imgBlockWidth;
+            if (isGrid) {
+                metaData.height = 104;
+                metaData.width = 120;
+            } else {
+                metaData.width = fileWindow.width();
+                metaData.height = 37;
+            }
+            //Number of images in a row
+            metaData.numberX = fileWindow.width()/metaData.width;
+
+            //Number of rows in a view
+            metaData.numberY = fileWindow.height()/metaData.height;
+
+            //Number of images to be loaded in one step
+            metaData.stepUpNumber = metaData.numberX * (metaData.numberY + 1);
+
+            return metaData;
+        }
+
+        function lastImageInViewPort(metaData) {
+            var fileWindow = element.getFileWindow();
+
+            var position = fileWindow.scrollTop();
+
+            return (position/metaData.height + metaData.numberY) * metaData.numberX;
         }
 
         function show() {
