@@ -159,9 +159,10 @@ function attachDirectoryEvents(dirElement) {
     }
 
 	eventHandler.attachKeysEventOnDirectories(dirElement, directoriesParam.list);
-	eventHandler.attachClickEventOnDirectories(dirElement, directoriesParam.list);
+	var showContextMenu = (typeof(directoriesParam.delete) != 'undefined');
+	eventHandler.attachClickEventOnDirectories(dirElement, directoriesParam.list, showContextMenu);
 
-	renameDirectorySetup();	
+	renameDirectorySetup();
 	deleteDirectorySetup();
 
 	function renameDirectorySetup() {
@@ -171,12 +172,8 @@ function attachDirectoryEvents(dirElement) {
 	}
 
 	function deleteDirectorySetup() {
-		var deleteDirBtn = element.getDeleteDirectory();
-		if (directoriesParam.destroy) {
-			element.show(deleteDirBtn);
-			eventHandler.attachDeleteDirectoryEvent();
-		} else {
-			element.hide(deleteDirBtn);
+		if (directoriesParam.delete) {
+			eventHandler.attachDeleteDirectoryEvent(directoriesParam.delete);
 		}
 	}
 }
@@ -184,7 +181,6 @@ function attachDirectoryEvents(dirElement) {
 function attachFileEvents() {
 	eventHandler.attachKeysEventOnFiles();
 	eventHandler.attachClickEventOnFiles();
-	eventHandler.attachSortEventOnHeader();
 
     if (modalBoxParams.context_menu == true) {
         eventHandler.attachFileContextMenuEvent();

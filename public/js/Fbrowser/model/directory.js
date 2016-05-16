@@ -22,8 +22,10 @@ function directory() {
 
         renameDirectory : renameDirectory,
 
-        getCurrentDirectory : getCurrentDirectory,
+        getCurrentDirectoryElement : getCurrentDirectoryElement,
+        getCurrentDirectoryData : getCurrentDirectoryData,
         getCurrentDirectoryPath : getCurrentDirectoryPath,
+        getRootDirectory : getRootDirectory,
         childDirOpen : childDirOpen,
         isRootDirectory : isRootDirectory
         
@@ -85,7 +87,7 @@ function renameDirectory (dirElement) {
 ** Create new directory
 *****************************************************/
 function addNewDirectoryToSelectedDirectory() {
-    var selectedDir = getCurrentDirectory().element;
+    var selectedDir = getCurrentDirectoryElement();
     var parentDir;
 
     if (isRootDirectory(selectedDir)) {
@@ -108,13 +110,14 @@ function getNewDirectoryData(inputElement) {
     }
 }
 
-function saveDirectory(inputElement, value) {
+function saveDirectory(inputElement, value, path) {
     if (!value) value = inputElement.val();
     var directoryBox = inputElement.closest('div')
     directoryBox.attr('id', util.slugify(value));
     inputElement.replaceWith('<span class="editable">' + value+ '</span>');
     var directory = {};
     directory.name = value;
+    directory.path = path;
     directoriesData[util.slugify(value)] = directory;
     return directoryBox.closest('li');
 }
@@ -131,20 +134,20 @@ function removeDirectory(element) {
 ** Support functions
 *****************************************************/
 
-function isRootDirectory(element) {
-    return element.find('>div').attr('id') == '-root-';
-}
-
-function getCurrentDirectory() {
-    var dir = element.getDirectories().find('li.active');
+function getCurrentDirectoryElement() {
+    return element.getDirectories().find('li.active');
     return {
         data : getDirectoryData(dir),
         element : dir
     }
 }
 
+function getCurrentDirectoryData() {
+    return getDirectoryData(getCurrentDirectoryElement());
+}
+
 function getCurrentDirectoryPath() {
-    var currentElement = getCurrentDirectory().element;
+    var currentElement = getCurrentDirectoryElement();
 
     if (currentElement && currentElement.length > 0) {
         if (isRootDirectory(currentElement)) {
@@ -206,8 +209,12 @@ function getNewDirectoryElement(directory) {
     '</li>';
 }
 
+function getRootDirectory() {
+    return element.getDirectories().find('#-root-').closest('li');
+}
+
 function isRootDirectory() {
-    return (getCurrentDirectory().data.id == '-root-');
+    return (getCurrentDirectoryData().id == '-root-');
 }
 
 module.exports = directory;

@@ -72,7 +72,7 @@ function attachSearchFilesEvent() {
 
     function addCurrentDirectorySearch() {
     	
-	    var dirName = reqHandler.getDirHandler().getCurrentDirectory().data.name;
+	    var dirName = reqHandler.getDirHandler().getCurrentDirectoryData().name;
 	    if (!dirName) dirName = 'This directory';
 	    var id = (reqHandler.getDirHandler().isRootDirectory()) ? 'root' : util.slugify(dirName);
 	    element.getFileSearchOptions().append($(searchLiElement(id, dirName, 'fa-folder-o')));
@@ -138,11 +138,16 @@ function attachDiskElementEvent(callback) {
 /****************************************************
 ** Directory Events
 *****************************************************/
-function attachClickEventOnDirectories(dirElement, url) {
+function attachClickEventOnDirectories(dirElement, url, showContextMenu) {
 
 	dirElement.each(function() {
 		var liElement = $(this);
+		if (showContextMenu) {
+			showDirectoryContextMenu(liElement);
+		}
+
 		liElement.find('> div').click(function() {
+
             resetView();
 			element.select(element.getDirectories(), liElement);
 
@@ -246,7 +251,7 @@ function attachCreateDirectoryEvent(url) {
 
 		function success(response) {
             if (response.success == true) {
-                var dirElement = reqHandler.getDirHandler().saveDirectory(inputElement);
+				var dirElement = reqHandler.getDirHandler().saveDirectory(inputElement, response.directory.name, response.directory.path);
                 reqHandler.attachDirectoryEvents(dirElement);
             } else {
                 alert('Directory already exists');
@@ -289,7 +294,7 @@ function attachRenameDirectoryEvent(dirElement, url) {
         function focusOutEvent() {
             var newValue = inputElement.val();
             if (oldValue != newValue && newValue != '') {
-                var params = reqHandler.getDirHandler().getCurrentDirectory().data;
+                var params = reqHandler.getDirHandler().getCurrentDirectoryData();
                 params.new_value = newValue;
                 reqHandler.makeAjaxRequest(url, success, fail, false, params);
             } else {
@@ -309,9 +314,52 @@ function attachRenameDirectoryEvent(dirElement, url) {
 	}
 }
 
-function attachDeleteDirectoryEvent() {
+function showDirectoryContextMenu(directoryElement) {
 
+	directoryElement.find('>div').off('contextmenu');
+	directoryElement.find('>div').on('contextmenu', function(e) {
+		directoryElement.find('> div').click();
+		showDirectoryMenu(directoryElement);
+		hideMenuEventListener(directoryElement, element.getDirectoryContextMenu());
+		e.preventDefault();
+	});
+
+
+	function showDirectoryMenu(target) {
+		var menu = element.getDirectoryContextMenu();
+		element.show(menu);
+		positionMenu(target, menu);
+	}
 }
+
+function attachDeleteDirectoryEvent(deleteURL) {
+	var deleteBtn = element.getDeleteDirectory();
+
+	deleteBtn.off('click');
+	deleteBtn.on('click', function(){
+		var selected = reqHandler.getDirHandler().getCurrentDirectoryElement();
+		var directoryData = reqHandler.getDirHandler().getCurrentDirectoryData();
+		var data = {
+			name : directoryData.name,
+			path : directoryData.path
+		};
+
+		reqHandler.makeAjaxRequest(deleteURL, success, fail, false, data);
+
+		function success(response) {
+			if (response.success == true) {
+				reqHandler.getDirHandler().removeDirectory(selected);
+				element.select(element.getDirectories(), reqHandler.getDirHandler().getRootDirectory());
+			}
+		}
+
+		function fail() {
+
+		}
+	});
+}
+
+
 
 /****************************************************
 ** File Events
@@ -396,10 +444,6 @@ function attachKeysEventOnFiles() {
 
 		}
 	}
-
-}
-
-function attachSortEventOnHeader() {
 
 }
 
@@ -544,7 +588,7 @@ function attachFileManageMenuEvent() {
         showFileManageMenu($(this));
     });
 
-    hideMenuEventListener(element.getFileManageMenu());
+    hideMenuEventListener(element.getFileManageMenu(), element.getFileContextMenu());
 
 }
 
@@ -567,17 +611,15 @@ function attachFileContextMenuEvent() {
 			e.preventDefault();
 		});
 	}
+
+	function showFileManageMenu(target) {
+		var menu = element.getFileContextMenu();
+		element.show(menu);
+		positionMenu(target, menu);
+	}
 }
 
-
-function showFileManageMenu(target) {
-    var menu = element.getFileContextMenu();
-    element.show(menu);
-    positionMenu(target);
-}
-
-function hideMenuEventListener(target) {
-    var menu = element.getFileContextMenu();
+function hideMenuEventListener(target, menu) {
     $(document).on('click', function(e) {
         if (target && !target.is($(e.target))) {
             element.hide(menu);
@@ -585,8 +627,7 @@ function hideMenuEventListener(target) {
     });
 }
 
-function positionMenu(target) {
-    var menu = element.getFileContextMenu();
+function positionMenu(target, menu) {
     // clickCoords = element.getPosition(e);
     var clickCoordsX = target.offset().left;
     var clickCoordsY = target.offset().top + (target.height() / 2);
@@ -637,7 +678,6 @@ module.exports = {
 	attachClickEventOnFiles : attachClickEventOnFiles,
 	attachKeysEventOnFiles : attachKeysEventOnFiles,
 	attachUploadFileEvent : attachUploadFileEvent,
-    attachSortEventOnHeader : attachSortEventOnHeader,
 
 	attachRenameFileEvent : attachRenameFileEvent,
 	attachRemoveFileEvent : attachRemoveFileEvent,

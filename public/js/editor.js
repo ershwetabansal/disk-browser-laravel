@@ -43,7 +43,8 @@ browser.setup({
     },
     directories: {
         list: '/api/v1/directories',
-        create: '/api/v1/directory/store'
+        create: '/api/v1/directory/store',
+        delete: '/api/v1/directory/destroy'
     },
     files: {
         list: '/api/v1/files',
@@ -65,13 +66,15 @@ browser.setup({
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         error : function(status, response) {
-            console.log(response);
+            var message = '';
             if (status == '422') {
                 for (var key in response) {
-                    return response[key][0];
+                    if (typeof(response[key]) == 'object') {
+                        message = message + response[key][0] + ' ';
+                    }
                 }
             }
-            return 'Error encountered. ';
+            return (message == '') ? 'Error encountered. ' : message ;
         }
     },
     authentication : "session"

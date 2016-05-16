@@ -26,12 +26,19 @@
 </div>
 
 <div class="modal fade file-manager" id="FileBrowser" tabindex="-1" role="dialog">
+
     <nav id="file-context-menu" class="context-menu hidden">
         <ul class="list-unstyled">
             <li><a href="#" id="view-file"><i class="fa fa-eye"></i> View</a></li>
             <li><a href="#" id="rename-file"><i class="fa fa-edit"></i> Rename</a></li>
-            <li><a href="#" id="remove-file"><i class="fa fa-trash"></i> Remove</a></li>
+            <li><a href="#" id="remove-file"><i class="fa fa-trash"></i> Delete</a></li>
             <li><a href="#" id="download-file"><i class="fa fa-download"></i> Download</a></li>
+        </ul>
+    </nav>
+
+    <nav id="directory-context-menu" class="context-menu hidden">
+        <ul class="list-unstyled">
+            <li><a href="#" id="remove-directory"><i class="fa fa-trash"></i> Delete</a></li>
         </ul>
     </nav>
 

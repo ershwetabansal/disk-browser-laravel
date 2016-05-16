@@ -9,8 +9,7 @@ var fbElement,
     directoryWindow,
     directoriesList,
     createNewDirectory,
-    deleteDirectory,
-    
+
     fileWindow,
     fileList,
     fileGrid,
@@ -21,6 +20,9 @@ var fbElement,
     fileDownload,
     fileView,
     fileManageMenu,
+
+    directoryContextMenu,
+    deleteDirectory,
 
     fileRenameBox,
     fileRenameClose,
@@ -149,10 +151,24 @@ function getCreateNewDirectory() {
 
 }
 
+/************************************************
+ * Directory context menu
+ ************************************************/
+
+function getDirectoryContextMenu() {
+    if(!directoryContextMenu || directoryContextMenu.length == 0) {
+        directoryContextMenu = getFileBrowser().find('#directory-context-menu');
+    }
+
+    return directoryContextMenu;
+
+
+}
+
 function getDeleteDirectory() {
 
     if(!deleteDirectory || deleteDirectory.length == 0) {
-        deleteDirectory = getFileBrowser().find('#fb_delete_directory');
+        deleteDirectory = getDirectoryContextMenu().find('#remove-directory');
     }
 
     return deleteDirectory;
@@ -723,8 +739,7 @@ module.exports = {
     getDirectoryWindow: getDirectoryWindow,
     getDirectories: getDirectories,
     getCreateNewDirectory: getCreateNewDirectory,
-    getDeleteDirectory: getDeleteDirectory,
-    
+
     getFileWindow: getFileWindow,
     getFilesList: getFilesList,
     getFilesGrid: getFilesGrid,
@@ -736,6 +751,9 @@ module.exports = {
     getDownloadFile: getDownloadFile,
     getRenameFile: getRenameFile,
     getRemoveFile: getRemoveFile,
+
+    getDirectoryContextMenu: getDirectoryContextMenu,
+    getDeleteDirectory: getDeleteDirectory,
 
     getRenameFileBox: getRenameFileBox,
     getRenameFileInput : getRenameFileInput,
