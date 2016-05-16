@@ -86,7 +86,7 @@ describe("File browser should be able to manage directories and ", function() {
     	var directory = element.getDirectories().find('li').eq(1);
 		element.select(element.getDirectories(), directory);
 
-    	expect(setup.getDirHandler().getCurrentDirectory().element.text()).toBe(directory.text());
+    	expect(setup.getDirHandler().getCurrentDirectoryElement().text()).toBe(directory.text());
 
     });
 
@@ -102,5 +102,37 @@ describe("File browser should be able to manage directories and ", function() {
 		expect(setup.getDirHandler().childDirOpen(directory)).toBe(false);
 
     });
+
+	it("should be able to delete a root level directory", function() {
+
+		var totalDirectoriesBeforeDelete = element.getDirectories().find('li').length;
+
+		var directory = element.getDirectories().find('li').eq(1);
+
+		setup.getDirHandler().removeDirectory(directory);
+		var totalDirectoriesAfterDelete = element.getDirectories().find('li').length;
+
+		expect(totalDirectoriesAfterDelete).toBe(totalDirectoriesBeforeDelete - 1);
+	});
+
+	it("should be able to delete a directory inside another directory", function() {
+
+		var directory = element.getDirectories().find('li').eq(1);
+		element.select(directory.closest('ul'), directory);
+		setup.getDirHandler().showSubDirectories(directory, stub.getSubDirectoryData());
+
+		var subDirectories = directory.find('ul').find('li');
+
+		var totalDirectoriesBeforeDelete = subDirectories.length;
+
+		var subDirectory = subDirectories.eq(1);
+
+		setup.getDirHandler().removeDirectory(subDirectory);
+		var totalDirectoriesAfterDelete = directory.find('ul').find('li').length;
+
+		expect(totalDirectoriesAfterDelete).toBe(totalDirectoriesBeforeDelete - 1);
+
+	});
+
 });
 
