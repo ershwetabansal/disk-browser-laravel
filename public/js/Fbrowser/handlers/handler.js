@@ -90,8 +90,11 @@ function setupEvents() {
 function load(modalBoxParameters) {
     modalBoxParams = modalBoxParameters || {};
 	eventHandler.resetView();
-	loadDisks();
-	loadDirectories();
+
+	if (element.getDirectories().find('li').length == 0) {
+		loadDisks();
+		loadDirectories();
+	}
 }
 
 function loadDisks() {

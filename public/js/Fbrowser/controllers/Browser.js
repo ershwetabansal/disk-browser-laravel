@@ -32,4 +32,4 @@ window.FileBrowser = function() {
 			return new Browser();
 		}
 	}
-}
+};
