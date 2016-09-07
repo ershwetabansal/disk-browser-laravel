@@ -48,14 +48,14 @@ return [
             'root'   => storage_path('app'),
         ],
 
-        'ea_images' => [
+        'images' => [
             'driver' => 'local',
             'root'   => env('BASE_PATH') . 'public/images',
         ],
 
-        'ea_publications' => [
+        'documents' => [
             'driver' => 'local',
-            'root'   => env('BASE_PATH') . 'public/publications',
+            'root'   => env('BASE_PATH') . 'public/documents',
         ],
 
         'integration_tests' => [

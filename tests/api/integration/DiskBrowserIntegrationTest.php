@@ -9,8 +9,14 @@ class DiskBrowserIntegrationTest extends TestCase
 
     use DatabaseTransactions;
 
+    /**
+     * @var string
+     */
     private $testDirectory = 'elephants';
 
+    /**
+     * @var \App\DiskBrowser\DiskBrowser
+     */
     private $browser;
 
     public function setUp()
@@ -41,7 +47,7 @@ class DiskBrowserIntegrationTest extends TestCase
         |  spreadsheet.xlsx
         */
 
-        $this->browser = new \App\DiskBrowser('integration_tests');
+        $this->browser = new \App\DiskBrowser\DiskBrowser('integration_tests');
     }
 
     public function tearDown()
@@ -58,7 +64,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // And setup disk browser for 'integration_tests' disk
 
         // And get the list of directories in root directory
-        $result = $this->browser->listDirectoriesIn();
+        $result = $this->browser->listDirectoriesIn('/');
 
         // Then we see three directories
         $this->assertEquals(sizeof($result), 3);
@@ -158,7 +164,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // And setup disk browser for 'integration_tests' disk
 
         // And get the list of files in root path
-        $result = $this->browser->listFilesIn();
+        $result = $this->browser->listFilesIn('/');
 
         // Then we see three files in the root path
         $this->assertEquals(sizeof($result), 3);
@@ -166,15 +172,15 @@ class DiskBrowserIntegrationTest extends TestCase
         $expectations = [
             [
                 'name' => 'i-love-this-dog.jpg',
-                'path' => '/',
+                'path' => '/test/',
             ],
             [
                 'name' => 'my-cat.jpg',
-                'path' => '/'
+                'path' => '/test/'
             ],
             [
                 'name' => 'my-dog.jpg',
-                'path' => '/'
+                'path' => '/test/'
             ],
         ];
 
@@ -205,7 +211,7 @@ class DiskBrowserIntegrationTest extends TestCase
         $expectations = [
             [
                 'name' => 'fat_cat.png',
-                'path' => '/cats/',
+                'path' => '/test/cats/',
             ],
         ];
 
@@ -234,7 +240,7 @@ class DiskBrowserIntegrationTest extends TestCase
         $expectations = [
             [
                 'name' => 'cute_puppies.jpg',
-                'path' => '/dogs/puppies/',
+                'path' => '/test/dogs/puppies/',
             ],
         ];
 
@@ -264,7 +270,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // And setup disk browser for 'integration_tests' disk
 
         // And create a directory in root directory
-        $result = $this->browser->createDirectory($this->testDirectory);
+        $result = $this->browser->createDirectory($this->testDirectory, '/');
 
         // Then we see newly created directories' name and path
         $expectations = [
@@ -284,7 +290,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // And setup disk browser for 'integration_tests' disk
 
         // And create a directory in root directory
-        $result = $this->browser->createDirectory($this->testDirectory);
+        $result = $this->browser->createDirectory($this->testDirectory, '/');
 
         // Then we see newly created directories' name and path
         $expectations = [
@@ -321,10 +327,10 @@ class DiskBrowserIntegrationTest extends TestCase
         // And setup disk browser for 'integration_tests' disk
 
         // And create a directory in root directory
-        $this->browser->createDirectory($this->testDirectory);
+        $this->browser->createDirectory($this->testDirectory, '/');
 
         //And then try to create the directory with the same name again
-        $this->browser->createDirectory($this->testDirectory);
+        $this->browser->createDirectory($this->testDirectory, '/');
     }
 
     /** @test */
@@ -335,10 +341,10 @@ class DiskBrowserIntegrationTest extends TestCase
         // And setup disk browser for 'integration_tests' disk
 
         // And we create a directory in root directory
-        $this->browser->createDirectory($this->testDirectory);
+        $this->browser->createDirectory($this->testDirectory, '/');
 
         // And have a local file ready to upload
-        $localFile = env('BASE_PATH') . 'tests/stubs/files/spreadsheet.xlsx';
+        $localFile = env('BASE_PATH') . 'tests/api/stubs/files/spreadsheet.xlsx';
 
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(
             $localFile,
@@ -352,7 +358,7 @@ class DiskBrowserIntegrationTest extends TestCase
         $result = $this->browser->createFile($uploadedFile, '/' . $this->testDirectory);
 
         $this->assertContains('spreadsheet', $result['name']);
-        $this->assertEquals('/' . $this->testDirectory . '/', $result['path']);
+        $this->assertEquals('/test/' . $this->testDirectory . '/', $result['path']);
         $this->asserttrue($result['size'] >= 0);
         $this->asserttrue($result['modified_at'] <= date('Y-m-d H:i:s'));
     }
@@ -366,7 +372,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // And the disk has the usual directory structure:
 
     	// When we search disk with word 'cute'
-        $result = $this->browser->searchDisk('cute');
+        $result = $this->browser->search('cute');
 
         $files = $result['files'];
 
@@ -390,19 +396,19 @@ class DiskBrowserIntegrationTest extends TestCase
             'files' => [
                 [
                     'name' => 'cute_cat.png',
-                    'path' => '/cats/cute/'
+                    'path' => '/test/cats/cute/'
                 ],
                 [
                     'name' => 'cute_puppies.jpg',
-                    'path' => '/dogs/puppies/'
+                    'path' => '/test/dogs/puppies/'
                 ],
                 [
                     'name' => 'cute_and_trained_puppies.jpg',
-                    'path' => '/dogs/puppies/trained/'
+                    'path' => '/test/dogs/puppies/trained/'
                 ],
                 [
                     'name' => 'cute_monkey.png',
-                    'path' => '/monkeys/cute/'
+                    'path' => '/test/monkeys/cute/'
                 ]
             ]
         ];
@@ -429,7 +435,7 @@ class DiskBrowserIntegrationTest extends TestCase
         // And it has the usual directory structure.
 
         // And we create an empty directory in root of the given disk
-        $this->browser->createDirectory($this->testDirectory);
+        $this->browser->createDirectory($this->testDirectory, '/');
 
         // we should be able to delete the test directory
         $this->assertTrue($this->browser->deleteDirectory($this->testDirectory, '/'));

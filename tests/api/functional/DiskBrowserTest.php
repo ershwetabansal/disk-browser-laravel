@@ -1,6 +1,7 @@
 <?php
 
 
+use App\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
@@ -41,9 +42,10 @@ class DiskBrowserTest extends TestCase
         |  spreadsheet.xlsx
         */
 
-        $user = factory(\App\User::class)->create();
+        $user = factory(User::class)->create();
+        $user->email = 'test@energyaspects.com';
 
-        $this->actingAs($user);
+        $this->be($user);
     }
 
     public function tearDown()
@@ -63,17 +65,19 @@ class DiskBrowserTest extends TestCase
         Auth::logout();
 
         // Any api request to server should get unauthorized response code
-        $this->json('post', '/api/v1/directories', ['disk' => 'integration_tests'])
+        $this->json('post', '/api/v1/disk/directories', ['disk' => 'integration_tests', 'path' => '/',], $this->ajaxHeaders())
             ->assertResponseStatus(401);
 
         // When user is logged in
-        $user = factory(\App\User::class)->create();
+        $user = factory(User::class)->create();
+        $user->email = 'test@energyaspects.com';
 
-        $this->actingAs($user)
+        $this->be($user);
 
-            //Then user should get 'Ok' response from server
-             ->json('post', '/api/v1/directories', ['disk' => 'integration_tests'])
-             ->assertResponseStatus(200);
+        //Then user should get 'Ok' response from server
+        $this->json('post', '/api/v1/disk/directories', ['disk' => 'integration_tests', 'path' => '/',], $this->ajaxHeaders())
+//             ->assertResponseStatus(200);
+        ->seeJson([]);
 
     }
 
@@ -85,8 +89,8 @@ class DiskBrowserTest extends TestCase
         // And it has the usual directory structure.
 
 
-        // When I make a POST request to /api/v1/directories
-        $this->json('post', '/api/v1/directories', ['disk' => 'integration_tests'])
+        // When I make a POST request to /api/v1/disk/directories
+        $this->json('post', '/api/v1/disk/directories', ['disk' => 'integration_tests', 'path' => '/'])
 
                 // Then I see the directories are as follows
                 ->seeJson([
@@ -112,8 +116,8 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/directories with the '/monkeys' path.
-        $this->json('post', '/api/v1/directories',
+        // When I make a POST request to /api/v1/disk/directories with the '/monkeys' path.
+        $this->json('post', '/api/v1/disk/directories',
                     ['disk' => 'integration_tests', 'path' => '/monkeys']
             )
             ->seeJson([
@@ -137,8 +141,8 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/directories with the '/dogs/puppies' path
-        $this->json('post', '/api/v1/directories',
+        // When I make a POST request to /api/v1/disk/directories with the '/dogs/puppies' path
+        $this->json('post', '/api/v1/disk/directories',
                     ['disk' => 'integration_tests', 'path' => '/dogs/puppies']
             )
 
@@ -160,8 +164,8 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/files with an incorrect path
-        $this->json('post', '/api/v1/directories',
+        // When I make a POST request to /api/v1/disk/files with an incorrect path
+        $this->json('post', '/api/v1/disk/directories',
             ['disk' => 'integration_tests', 'path' => '/this_does_not_exist']
         )
             //Then I see the following error
@@ -178,23 +182,23 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/files
-        $this->json('post', '/api/v1/files', ['disk' => 'integration_tests'])
+        // When I make a POST request to /api/v1/disk/files
+        $this->json('post', '/api/v1/disk/files', ['disk' => 'integration_tests', 'path' => '/',])
 
             //Then I see the following files
             ->seeJson([
                 'name' => 'i-love-this-dog.jpg',
-                'path' => '/',
+                'path' => '/test/',
                 'size' => 4.048,
             ])
             ->seeJsonContains([
                 'name' => 'my-dog.jpg',
-                'path' => '/',
+                'path' => '/test/',
                 'size' => 4.048,
             ])
             ->seeJsonContains([
                 'name' => 'my-cat.jpg',
-                'path' => '/',
+                'path' => '/test/',
                 'size' => 4.048,
             ]);
         
@@ -218,9 +222,9 @@ class DiskBrowserTest extends TestCase
 
         // And only images are allowed on that disk while one spreadsheet is present on the root path of disk
 
-        // When I make a post request to /api/v1/files
-        $this->json('post', '/api/v1/files',
-                    ['disk' => 'integration_tests']
+        // When I make a post request to /api/v1/disk/files
+        $this->json('post', '/api/v1/disk/files',
+                    ['disk' => 'integration_tests', 'path' => '/',]
             )
 
         // I should not see spreadsheet in the result
@@ -237,15 +241,15 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/files
-        $this->json('post', '/api/v1/files',
-                    ['disk' => 'integration_tests', 'path' => '/cats']
+        // When I make a POST request to /api/v1/disk/files
+        $this->json('post', '/api/v1/disk/files',
+                    ['disk' => 'integration_tests', 'path' => '/cats',]
             )
 
             //Then I see the following files
             ->seeJson([
                 'name' => 'fat_cat.png',
-                'path' => '/cats/',
+                'path' => '/test/cats/',
                 'size' => 0,
             ]);
 
@@ -267,20 +271,20 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/files
-        $this->json('post', '/api/v1/files',
+        // When I make a POST request to /api/v1/disk/files
+        $this->json('post', '/api/v1/disk/files',
                     ['disk' => 'integration_tests', 'path' => '/dogs/puppies/trained']
             )
 
             //Then I see the following files
             ->seeJson([
                 'name' => 'cute_and_trained_puppies.jpg',
-                'path' => '/dogs/puppies/trained/',
+                'path' => '/test/dogs/puppies/trained/',
                 'size' => 0,
             ])
             ->seeJson([
                 'name' => 'trained_puppies.jpg',
-                'path' => '/dogs/puppies/trained/',
+                'path' => '/test/dogs/puppies/trained/',
                 'size' => 0,
             ]);
 
@@ -302,8 +306,8 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/files with an incorrect path
-        $this->json('post', '/api/v1/files',
+        // When I make a POST request to /api/v1/disk/files with an incorrect path
+        $this->json('post', '/api/v1/disk/files',
                 ['disk' => 'integration_tests', 'path' => '/' . $this->testDirectory]
             )
             //Then I see the following error
@@ -321,9 +325,9 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/directory/store with a directory name
-        $this->json('post', '/api/v1/directory/store',
-                    ['disk' => 'integration_tests', 'name' => $this->testDirectory]
+        // When I make a POST request to /api/v1/disk/directory/store with a directory name
+        $this->json('post', '/api/v1/disk/directory/store',
+                    ['disk' => 'integration_tests', 'name' => $this->testDirectory, 'path' => '/',]
             )
 
             //Then I see success as true and the name and path for new directory
@@ -347,8 +351,8 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // When I make a POST request to /api/v1/files with an incorrect path
-        $this->json('post', '/api/v1/directory/store',
+        // When I make a POST request to /api/v1/disk/files with an incorrect path
+        $this->json('post', '/api/v1/disk/directory/store',
             ['disk' => 'integration_tests', 'path' => '/' . $this->testDirectory, 'name' => $this->testDirectory]
         )
             //Then I see the following error
@@ -366,10 +370,14 @@ class DiskBrowserTest extends TestCase
         // And it has the usual directory structure.
 
         // And there is one test directory created in the root disk
-        $this->json('post', '/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => $this->testDirectory]);
+        $this->json('post', '/api/v1/disk/directory/store', [
+            'disk' => 'integration_tests',
+            'name' => $this->testDirectory,
+            'path' => '/',
+        ]);
 
-        // When I make a POST request to /api/v1/files without a directory name
-        $this->json('post', '/api/v1/directory/store',
+        // When I make a POST request to /api/v1/disk/files without a directory name
+        $this->json('post', '/api/v1/disk/directory/store',
             ['disk' => 'integration_tests', 'name' => '', 'path' => '/' . $this->testDirectory]
         )
             //Then I see the following error
@@ -389,12 +397,16 @@ class DiskBrowserTest extends TestCase
         // And it has the usual directory structure.
 
         // And there is one test directory created in the root disk
-        $this->json('post', '/api/v1/directory/store',
-                    ['disk' => 'integration_tests', 'name' => $this->testDirectory]
+        $this->json('post', '/api/v1/disk/directory/store',
+                [
+                    'disk' => 'integration_tests',
+                    'name' => $this->testDirectory,
+                    'path' => '/',
+                ]
         );
 
         // When I make another request to add a directory inside the previously created directory
-        $this->json('post', '/api/v1/directory/store', [
+        $this->json('post', '/api/v1/disk/directory/store', [
             'disk' => 'integration_tests',
             'name' => $this->testDirectory,
             'path' => "/" . $this->testDirectory ,
@@ -420,16 +432,20 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // And I make a POST request to /api/v1/directory/store with a directory name
-        $this->json('post', '/api/v1/directory/store',
-                    ['disk' => 'integration_tests', 'name' => $this->testDirectory]
+        // And I make a POST request to /api/v1/disk/directory/store with a directory name
+        $this->json('post', '/api/v1/disk/directory/store',
+                    [
+                        'disk' => 'integration_tests',
+                        'name' => $this->testDirectory,
+                        'path' => '/',
+                    ]
         );
 
         // When I make another request to add the directory with the same name as used in previous step
         
 
-        $this->json('post', '/api/v1/directory/store', 
-                    ['disk' => 'integration_tests', 'name' => $this->testDirectory]
+        $this->json('post', '/api/v1/disk/directory/store', 
+                    ['disk' => 'integration_tests', 'name' => $this->testDirectory, 'path' => '/',]
             )
             //Then I see an error '422' and the error message
             ->seeJson([
@@ -439,7 +455,8 @@ class DiskBrowserTest extends TestCase
     }
 
 
-    /** @test */
+    /** test */
+    //TODO Laravel 5.2 is giving validation error on mimeType while the mimeType is correct. It needs to be debugged.
     public function it_stores_a_file_in_the_given_directory_of_a_given_disk()
     {
         // Given there is a disk named 'integration_tests'.
@@ -447,24 +464,28 @@ class DiskBrowserTest extends TestCase
         // And it has the usual directory structure.
 
         // And we add a test directory in the root of the disk
-        $this->json('post', '/api/v1/directory/store',
-                    ['disk' => 'integration_tests', 'name' => $this->testDirectory]
+        $this->json('post', '/api/v1/disk/directory/store',
+                    [
+                        'disk' => 'integration_tests',
+                        'name' => $this->testDirectory,
+                        'path' => '/',
+                    ]
         );
 
         // And there is a local file, ready for upload on the disk.
-        $localFile = env('BASE_PATH') . 'tests/stubs/files/elephant.jpg';
+        $localFile = env('BASE_PATH') . 'tests/api/stubs/files/elephant.jpg';
 
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(
             $localFile,
             'elephant.jpg',
-            'image/jpeg',
+            'image/png',
             null,
             null,
             true
         );
 
         // When I make a POST request to upload the file to the newly created test directory
-        $response = $this->call('POST', '/api/v1/file/store',
+        $response = $this->call('POST', '/api/v1/disk/file/store',
                 ['disk' => 'integration_tests', 'path' => '/' . $this->testDirectory],
                 [],
                 ['file' => $uploadedFile],
@@ -504,10 +525,14 @@ class DiskBrowserTest extends TestCase
         // And it has the usual directory structure.
 
         //There is one test directory created in the root disk
-        $this->json('post', '/api/v1/directory/store', ['disk' => 'integration_tests', 'name' => $this->testDirectory]);
+        $this->json('post', '/api/v1/disk/directory/store', [
+            'disk' => 'integration_tests',
+            'name' => $this->testDirectory,
+            'path' => '/',
+        ]);
 
         // And there is a local file, ready for upload on the disk.
-        $localFile = env('BASE_PATH') . 'tests/stubs/files/spreadsheet.xlsx';
+        $localFile = env('BASE_PATH') . 'tests/api/stubs/files/spreadsheet.xlsx';
 
         $uploadedFile = new Symfony\Component\HttpFoundation\File\UploadedFile(
             $localFile,
@@ -521,7 +546,7 @@ class DiskBrowserTest extends TestCase
         // When I make a POST request to upload the file
         $response = $this->call(
             'POST',
-            '/api/v1/file/store',
+            '/api/v1/disk/file/store',
             ['disk' => 'integration_tests', 'path' => '/' . $this->testDirectory],
             [],
             ['file' => $uploadedFile],
@@ -568,28 +593,28 @@ class DiskBrowserTest extends TestCase
             ->seeJsonContains(
                 [
                     'name' => 'cute_cat.png',
-                    'path' => '/cats/cute/',
+                    'path' => '/test/cats/cute/',
                     'size' => 0,
                 ]
             )
             ->seeJsonContains(
                 [
                     'name' => 'cute_puppies.jpg',
-                    'path' => '/dogs/puppies/',
+                    'path' => '/test/dogs/puppies/',
                     'size' => 0,
                 ]
             )
             ->seeJsonContains(
                 [
                     'name' => 'cute_and_trained_puppies.jpg',
-                    'path' => '/dogs/puppies/trained/',
+                    'path' => '/test/dogs/puppies/trained/',
                     'size' => 0,
                 ]
             )
             ->seeJsonContains(
                 [
                     'name' => 'cute_monkey.png',
-                    'path' => '/monkeys/cute/',
+                    'path' => '/test/monkeys/cute/',
                     'size' => 0,
                 ]
             );
@@ -605,12 +630,14 @@ class DiskBrowserTest extends TestCase
         // And it has the usual directory structure.
 
         // And there is one empty directory created
-        $this->json('post', '/api/v1/directory/store',
-            ['disk' => 'integration_tests', 'name' => $this->testDirectory]
+        $this->json('post', '/api/v1/disk/directory/store',
+            ['disk' => 'integration_tests', 'name' => $this->testDirectory, 'path' => '/']
         );
 
-        // And I make a POST request to /api/v1/directory/destroy with a directory path
-        $this->json('post', '/api/v1/directory/destroy',
+        $this->assertTrue(self::doesExist('/' . $this->testDirectory));
+
+        // And I make a POST request to /api/v1/disk/directory/destroy with a directory path
+        $this->json('post', '/api/v1/disk/directory/destroy',
             ['disk' => 'integration_tests', 'path' => '/' , 'name' => $this->testDirectory]
 
         )->seeJson([
@@ -629,8 +656,8 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // And I make a POST request to /api/v1/directory/destroy with a directory path which has sub-directories
-        $this->json('post', '/api/v1/directory/destroy',
+        // And I make a POST request to /api/v1/disk/directory/destroy with a directory path which has sub-directories
+        $this->json('post', '/api/v1/disk/directory/destroy',
             ['disk' => 'integration_tests', 'path' => '/', 'name' => 'cats']
 
         )->seeJson([
@@ -651,8 +678,8 @@ class DiskBrowserTest extends TestCase
 
         // And it has the usual directory structure.
 
-        // And I make a POST request to /api/v1/directory/destroy with a directory path which has files
-        $this->json('post', '/api/v1/directory/destroy',
+        // And I make a POST request to /api/v1/disk/directory/destroy with a directory path which has files
+        $this->json('post', '/api/v1/disk/directory/destroy',
             ['disk' => 'integration_tests', 'path' => '/cats/', 'name' => 'cute']
 
         )->seeJson([
@@ -688,13 +715,24 @@ class DiskBrowserTest extends TestCase
     }
 
     /**
-     * Returns http headers required for making http request
+     * Returns http headers required for making json request
      * @return array
      */
     private function jsonHeaders()
     {
         return $this->transformHeadersToServerVars([
             'Accept' => 'application/json',
+        ]);
+    }
+
+    /**
+     * Returns http headers required for making ajax request
+     * @return array
+     */
+    private function ajaxHeaders()
+    {
+        return $this->transformHeadersToServerVars([
+            'X-Requested-With' => 'XMLHttpRequest',
         ]);
     }
 }

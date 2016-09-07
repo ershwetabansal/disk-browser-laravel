@@ -10,16 +10,17 @@
 |
 */
 
-Route::group(['prefix' => '/api/v1/'], function () {
+Route::group(['prefix' => '/api/v1/disk/'], function () {
 
-    Route::group(['middleware' => ['auth.basic']], function () {
+    Route::group(['middleware' => ['auth']], function () {
 
-        Route::post('directories', 'DirectoryController@index');
-        Route::post('directory/store', 'DirectoryController@store');
-        Route::post('directory/destroy', 'DirectoryController@destroy');
-        Route::post('files', 'FileController@index');
-        Route::post('file/store', 'FileController@store');
-        Route::post('disk/search', 'DiskController@search');
+        // Routes for disk browser
+        Route::post('directories', 'Api\DirectoryController@index');
+        Route::post('directory/store', 'Api\DirectoryController@store');
+        Route::post('directory/destroy', 'Api\DirectoryController@destroy');
+        Route::post('files', 'Api\FileController@index');
+        Route::post('file/store', 'Api\FileController@store');
+        Route::post('disk/search', 'Api\DiskController@search');
 
    });
 });
