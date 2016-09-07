@@ -15,9 +15,5 @@
   "dependencies": {
     "bootstrap-sass": "^3.0.0",
     "disk-browser": "1.0.9"
-  },
-  "scripts": {
-    "start": "node app",
-    "postinstall": "gulp default"
   }
 }
