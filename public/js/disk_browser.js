@@ -6,23 +6,22 @@ browser.setup({
         search_URL: '/api/v1/disk/search',
         details : [
             {
-                name: 'website-assets',
-                label: 'Website assets',
-                allowed_extensions: ['png','jpg','jpeg','bmp','tiff','gif']
-            },
-            {
-                name: 'publications',
-                label: 'Publication images',
-                allowed_directories: ['/images'],
-                allowed_extensions: ['png','jpg','jpeg','bmp','tiff','gif'],
+                name: 'documents',
+                label: 'Documents',
+                allowed_extensions: ['pdf', 'doc', 'docx'],
                 read_only: true
             },
-
             {
-                name: 'website-assets',
-                label: 'Service overviews',
-                allowed_directories: ['/service_overviews'],
-                allowed_extensions: ['pdf', 'doc', 'docx']
+                name: 'images',
+                label: 'Team pictures',
+                allowed_directories: ['/pictures'],
+                allowed_extensions: ['png','jpg','jpeg','bmp','tiff','gif']
+
+            },
+            {
+                name: 'images',
+                label: 'Images',
+                allowed_extensions: ['png','jpg','jpeg','bmp','tiff','gif']
             }
 
         ]
