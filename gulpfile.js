@@ -16,7 +16,7 @@ gulp.task('copy', function() {
         .pipe(gulp.dest('public/app/build/disk-browser'));
 });
 
-gulp.task('default', function (callback) {
+gulp.task('heroku:production', function (callback) {
     runSequence(['sass', 'copy'],
         callback
     )
