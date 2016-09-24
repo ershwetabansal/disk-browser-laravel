@@ -34,13 +34,9 @@ Route::group(['middleware' => 'guest'], function()
 });
 
 // Authentication routes...
-Route::group(['middleware' => 'auth'], function()
-{
+Route::get('', function () {
 
-    Route::get('', function () {
-
-        return view('welcome');
-    });
+    return view('welcome');
 });
 
 Route::get('logout', 'Auth\AuthController@getLogout');
