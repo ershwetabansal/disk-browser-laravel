@@ -27,7 +27,7 @@
     "watchify": ">=3.0.0 <4.0.0"
   },
   "scripts": {
-    "start": "node index.js",
-    "heroku-postbuild": "gulp"
+    "start": "composer update",
+    "heroku-postbuild": "gulp default"
   }
 }
