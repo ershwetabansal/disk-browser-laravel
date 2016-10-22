@@ -1,23 +1,21 @@
-var gulp = require('gulp');
-var sass = require('gulp-sass');
-var browserify = require('browserify');
-var source = require('vinyl-source-stream');
-var runSequence = require('run-sequence');
+const elixir = require('laravel-elixir');
 
-gulp.task('sass', function(){
-    return gulp.src('public/sass/app.scss')
-        .pipe(sass()) // Converts Sass to CSS with gulp-sass
-        .pipe(gulp.dest('public/app/build/css'));
-});
+require('laravel-elixir-vue-2');
 
-gulp.task('copy', function() {
-    return gulp.src('node_modules/disk-browser/dist/**/*')
-        // Start piping stream to tasks!
-        .pipe(gulp.dest('public/app/build/disk-browser'));
-});
+/*
+ |--------------------------------------------------------------------------
+ | Elixir Asset Management
+ |--------------------------------------------------------------------------
+ |
+ | Elixir provides a clean, fluent API for defining some basic Gulp tasks
+ | for your Laravel application. By default, we are compiling the Sass
+ | file for your application as well as publishing vendor resources.
+ |
+ */
 
-gulp.task('heroku:production', function (callback) {
-    runSequence(['sass', 'copy'],
-        callback
-    )
+elixir((mix) => {
+    mix.sass('app.scss')
+       .webpack('app.js');
+
+    mix.copy('node_modules/disk-browser/dist', 'public/app/build/diskbrowser');
 });

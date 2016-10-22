@@ -3,45 +3,58 @@ browser.setup({
 
     disks : {
         search : true,
-        search_URL: '/api/v1/disk/search',
+        search_URL: 'api/v1/disk/search',
         details : [
             {
-                name: 'documents',
-                label: 'Documents',
-                allowed_extensions: ['pdf', 'doc', 'docx'],
-                read_only: true
-            },
-            {
-                name: 'images',
-                label: 'Team pictures',
-                allowed_directories: ['/pictures'],
+                name: 'image_disk',
+                label: 'Cats',
+                root_directory_path: ['/cats/Kittens'],
+                path: {
+                    root: '/assets/cats/Kittens'
+                },
+                root_read_only: true,
                 allowed_extensions: ['png','jpg','jpeg','bmp','tiff','gif']
-
             },
             {
-                name: 'images',
+                name: 'image_disk',
                 label: 'Images',
+                path: {
+                    root: '/assets'
+                },
                 allowed_extensions: ['png','jpg','jpeg','bmp','tiff','gif']
+            },
+            {
+                name: 'image_disk',
+                label: 'Read only',
+                path: {
+                    root: '/assets'
+                },
+                read_only: true,
+                allowed_extensions: ['png','jpg','jpeg','bmp','tiff','gif']
+            },
+            {
+                name: 'doc_disk',
+                label: 'Documents',
+                path: {
+                    root: '/documents'
+                },
+                allowed_extensions: ['doc','docx','pdf','xls','xlsx']
             }
-
         ]
     },
     directories: {
         list: '/api/v1/disk/directories',
-        create: '/api/v1/disk/directory/store'
+        create: '/api/v1/disk/directory/store',
+        delete: '/api/v1/disk/directory/destroy',
+        update: '/api/v1/disk/directory/update',
     },
     files: {
         list: '/api/v1/disk/files',
+        destroy : '/api/v1/disk/file/destroy',
+        update : '/api/v1/disk/file/update',
         upload: {
             url: '/api/v1/disk/file/store',
-            params:[]
-        },
-        thumbnail: {
-            show : true,
-            directory : '/thumbnails',
-            path : '',
-            prefix : '',
-            suffix : ''
+            params:[{name : 'name', label : 'File Name'}]
         },
         size_unit : 'KB'
     },
@@ -50,6 +63,7 @@ browser.setup({
             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
         },
         error : function(status, response) {
+            console.log("error :"+status);
             var message = '';
             if (status == '422') {
                 for (var key in response) {
@@ -61,40 +75,46 @@ browser.setup({
             return (message == '') ? 'Error encountered. ' : message ;
         }
     },
-    authentication : "session"
 });
 
-function tinmyceDiskBrowser(field_id, url, type, win)
-{
-    browser.openBrowser({
-        disks : [
-            'Website assets', 'Publication images'
-        ],
-        button : {
-            text : 'Update URL',
-            onClick : function(path) {
-                win.document.getElementById(field_id).value = path;
-            }
-        }
-    });
-}
+(function() {
+        $('[data-disk-browser="true"]').on('click', function() {
+            var element = $(this);
+            var buttonText = $(this).attr('data-disk-browser-btn');
+            var disks = $(this).attr('data-disks');
+            var image = $(this).attr('data-update-image');
+            var inputBox = $(this).attr('data-update');
+            
+            var configParameters = {};
 
-/**
- * Set up the callback and other config parameters on display of disk browser.
- *
- * @param callback
- * @param disks
- */
-function accessBrowser(callback, disks)
+            if (buttonText && (inputBox || image))  {
+                configParameters.button  = {
+                    text : buttonText,
+                    onClick : function(path) {
+                        $('[data-type="'+inputBox+'"]').val(path);
+                        $('[data-type="'+image+'"]').attr('src', path);
+                    }
+                }        
+            };
+
+            if (disks) {
+                configParameters.disks = getArrayFromCSV(disks);
+            }
+
+            browser.openBrowser(configParameters);
+        });
+})();
+
+function accessDiskBrowser(callback, disks)
 {
-    var configParameters = {
-        button : {
-            text : 'Update URL',
+    var configParameters = {};
+
+    configParameters.button  = {
+            text : 'Update',
             onClick : function(path) {
                 if (callback) callback(path);
             }
-        }
-    };
+        };
 
     if (disks) {
         configParameters.disks = getArrayFromCSV(disks);
